@@ -8,7 +8,8 @@
 (defn cards-html [qry] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/destiny.db"}
                              all-cards (sql/query db-spec [qry])
                              card-rows (map #(html [:tr [:td (:cardset %)] [:td (:position %)][:td (:name %)][:td (:typename %)]
-                                                    [:td (:isunique %)][:td (:affiliation %)][:td (:faction %)][:td (:cminpoints %)][:td (:cmaxpoints %)]]) all-cards)]
+                                                    [:td (:isunique %)][:td (:rarity %)][:td (:affiliation %)][:td (:faction %)]
+                                                    [:td (:cminpoints %)][:td (:cmaxpoints %)][:td (:chealth %)][:td [:a {:href (:imgsrc %)} (:imgsrc %)]]]) all-cards)]
                          (html [:h6 [:style "table,th,td {
                                      border: 1px solid black;
                                      border-collapse: collapse;
@@ -16,7 +17,7 @@
                                      }
                                      "]; 
                                 [:table 
-                                 [:tr [:th "Set"] [:th "Position"] [:th "Name"][:th "Type"][:th "Is Unique"][:th "Affiliation"] [:th "Faction"][:th "Min Cost"][:th "Max Cost"]]
+                                 [:tr [:th "Set"] [:th "Position"] [:th "Name"][:th "Type"][:th "Is Unique"][:th "Rarity"][:th "Affiliation"] [:th "Faction"][:th "Min Cost"][:th "Max Cost"][:th "Health"][:th "Img Source"]]
                                  card-rows]])))
 
 
