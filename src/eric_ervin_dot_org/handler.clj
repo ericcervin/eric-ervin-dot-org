@@ -42,8 +42,9 @@
                                          }
                                          "]
                                          
-                                        [:h3 "A toy website to release some Clojure into the world."
-                                         [:p "Though it's a toy, these are resources I use."]]
+                                        [:h4 [:p "A toy website to release some Clojure into the world." [:br]
+                                                 "Though it's a toy, these are resources I use."]
+                                         [:a {:href "https://github.com/ericcervin/eric-ervin-dot-org"} "https://github.com/ericcervin/eric-ervin-dot-org"]]
                                         [:table
                                          [:tr   [:th "Resource"] [:th "Description"][:th "Data Updated"]]                            
                                          [:tr   [:td [:a {:href "/powerball"} "Powerball"]][:td " A source for Powerball numbers to play"][:td "N/A"]]
