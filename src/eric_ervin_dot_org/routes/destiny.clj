@@ -5,20 +5,24 @@
             [hiccup.core :refer [html]]
             [clojure.java.jdbc :as sql]))
 
-(defn map-html-table-row [mp]
+(def html-style-css [:style "table,th,td {
+                                          border: 1px solid black;
+                                          border-collapse: collapse;
+                                          padding: 3px;
+                                         }
+                                         "])
+                                         
+
+(defn map-html-table-td-row [mp]
   (html [:tr (map #(html [:td (second %)]) mp)]))
 
 (defn cards-html [qry] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/destiny.db"}
                              all-cards (sql/query db-spec [qry])
                              card-rows (map #(html [:tr [:td (:cardset %)] [:td (:position %)][:td (:name %)][:td (:typename %)]
-                                                    [:td (:isunique %)][:td (:rarity %)][:td (:affiliation %)][:td (:faction %)]
-                                                    [:td (:cminpoints %)][:td (:cmaxpoints %)][:td (:chealth %)][:td [:a {:href (:imgsrc %)} (:imgsrc %)]]]) all-cards)]
-                         (html  [:style "table,th,td {
-                                  border: 1px solid black;
-                                  border-collapse: collapse;
-                                  padding: 3px;
-                                  }
-                                  "]; 
+                                                        [:td (:isunique %)][:td (:rarity %)][:td (:affiliation %)][:td (:faction %)]
+                                                        [:td (:cminpoints %)][:td (:cmaxpoints %)][:td (:chealth %)][:td [:a {:href (:imgsrc %)} (:imgsrc %)]]]) all-cards)]
+                         
+                         (html  html-style-css
                                 [:h1 [:table 
                                       [:tr [:th "Set"] [:th "Position"] [:th "Name"][:th "Type"][:th "Is Unique"][:th "Rarity"][:th "Affiliation"] [:th "Faction"][:th "Min Cost"][:th "Max Cost"][:th "Health"][:th "Img Source"]]
                                       card-rows]])))
@@ -29,30 +33,16 @@
                                    qry (:query qry-map)
                                    header (:header qry-map)
                                    results (sql/query db-spec [qry])
-                                   ;;report-rows (map #(html [:tr [:td (:affiliation %)] [:td (:faction %)][:td (:count %)]]) results)]
-                                   report-rows (map map-html-table-row results)]
-                               (html [:style "table,th,td {
-                                      border: 1px solid black;
-                                      border-collapse: collapse;
-                                      padding: 3px;
-                                      }
-                                      "]; 
+                                   report-rows (map map-html-table-td-row results)]
+                               (html html-style-css
                                  [:table 
-                                  [:tr [:th (header 0) [:th (header 1) [:th (header 2)]]]]
+                                  [:tr (map #(html [:th %]) header)]
                                   report-rows])))
-
 
 (defresource res-destiny [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (fn [ctx] (html [:style "table,th,td {
-                                          border: 1px solid black;
-                                          border-collapse: collapse;
-                                          padding: 3px;
-                                         }
-                                         "]
-                                         
-                                        
+             :handle-ok (fn [ctx] (html html-style-css
                                         [:h4 "Cards"]
                                         [:table
                                          [:tr [:th ""] [:th "All"][:th "Villain"][:th "Hero"][:th "Neutral"]]
@@ -77,10 +67,10 @@
                                                               [:td [:a {:href "/destiny/cards?affil=Hero&fact=General"} "HTML"]]
                                                               [:td [:a {:href "/destiny/cards?affil=Neutral&fact=General"} "HTML"]]]]
                                     
-
-                                        [:h4 "Reports"]
-                                        [:table
-                                         [:tr [:th "Count by Affiliation/Faction"][:td [:a {:href "/destiny/reports?rpt=affiliation_faction_count"} "HTML"]]]])))
+                                    [:h4 "Reports"]
+                                    [:table
+                                     [:tr [:th "Count by Affiliation/Faction"][:td [:a {:href "/destiny/reports?rpt=affiliation_faction_count"} "HTML"]]]
+                                     [:tr [:th "Count by Set"][:td [:a {:href "/destiny/reports?rpt=set_count"} "HTML"]]]])))
 
 (defn cards-query [ctx] 
   (let [affil (get-in ctx [:request :params "affil"])
@@ -95,9 +85,11 @@
 (defn report-query [ctx] 
        (if-let [qry-map (cond (= (get-in ctx [:request :params "rpt"]) "affiliation_faction_count") 
                               {:header ["Affilliation" "Faction" "Count"] 
-                               :query "Select affiliation, faction, count(*) as count from card group by affiliation, faction"})] 
-                 
-            (reports-html qry-map)))
+                               :query "Select affiliation, faction, count(*) as count from card group by affiliation, faction"}
+                              (= (get-in ctx [:request :params "rpt"]) "set_count") 
+                              {:header ["Set" "Count"] 
+                               :query "Select cardset, count(*) as count from card group by cardset"})]  
+         (reports-html qry-map)))
 
 (defresource res-cards [ctx] :allowed-methods [:get :options] :available-media-types ["text/html"] :handle-ok cards-query)
 (defresource res-reports [ctx] :allowed-methods [:get :options] :available-media-types ["text/html"] :handle-ok report-query)
