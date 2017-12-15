@@ -48,7 +48,7 @@
                                         [:table
                                          [:tr   [:th "Resource"] [:th "Description"][:th "Data Updated"]]                            
                                          [:tr   [:td [:a {:href "/powerball"} "Powerball"]][:td " A source for Powerball numbers to play"][:td "N/A"]]
-                                         [:tr   [:td [:a {:href "/destiny"} "Destiny"]][:td "Data re: Star Wars Destiny card game"][:td "12/11/2017"]]])))
+                                         [:tr   [:td [:a {:href "/destiny"} "Destiny"]][:td "Data re: Star Wars Destiny card game"][:td "12/14/2017"]]])))
                                         
                                     
                                          
