@@ -4,7 +4,13 @@
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [hiccup.core :refer [html]]))
 
-
+(def html-style-css [:style "table,th,td {
+                                          border: 1px solid black;
+                                          border-collapse: collapse;
+                                          padding: 3px;
+                                          text-align: left;
+                                         }
+                                         "])
 
 
 (defn powerball-row-map []
@@ -26,21 +32,8 @@
           
 
 (defn powerball-html [_]  
-  (html [:style "table,th,td {
-                 border: 1px solid black;
-                 border-collapse: collapse;
-                 padding: 15px;
-                 }
-         "];
-    
-    
-    [:table  [:tr 
-              [:th "1"]
-              [:th "2"]
-              [:th "3"]
-              [:th "4"]
-              [:th "5"]
-              [:th "pb"]]
+  (html html-style-css        
+    [:table  [:tr [:th "1"][:th "2"][:th "3"][:th "4"][:th "5"][:th "pb"]]
              (powerball-row-html)
              (powerball-row-html)]))
 
@@ -59,12 +52,7 @@
 (defresource res-powerball [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (fn [ctx] (html [:style "table,th,td {
-                                          border: 1px solid black;
-                                         border-collapse: collapse;
-                                         padding: 15px;
-                                         }
-                                         "]
+             :handle-ok (fn [ctx] (html html-style-css
                                          
                                         [:h4 "Two sets of Powerball numbers"]
                                         [:table
