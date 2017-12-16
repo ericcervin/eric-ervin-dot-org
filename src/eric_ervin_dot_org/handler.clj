@@ -5,11 +5,17 @@
             [hiccup.core :refer [html]]
             [clojure.java.jdbc :as sql]
             [eric-ervin-dot-org.routes.powerball :refer [powerball-routes]]
-            ;;[eric-ervin-dot-org.routes.discogs   :refer [discogs-routes]]
+            [eric-ervin-dot-org.routes.discogs   :refer [discogs-routes]]
             [eric-ervin-dot-org.routes.destiny   :refer [destiny-routes]]))
+
+(def html-style-css [:style "table,th,td {
+                                          border: 1px solid black;
+                                          border-collapse: collapse;
+                                          padding: 3px;
+                                          text-align: left
+                                         }
+                                         "])
             
-
-
                      
 (defn serialism_rows [_] (let [P0 (vec (shuffle (range 12)))
                                R0 (vec (reverse P0))
@@ -35,12 +41,7 @@
 (defresource root [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (fn [ctx] (html [:style "table,th,td {
-                                          border: 1px solid black;
-                                         border-collapse: collapse;
-                                         padding: 15px;
-                                         }
-                                         "]
+             :handle-ok (fn [ctx] (html html-style-css
                                          
                                         [:h4 [:p "A toy website to release some Clojure into the world." [:br]
                                                  "Though it's a toy, these are resources I use."]
@@ -48,7 +49,8 @@
                                         [:table
                                          [:tr   [:th "Resource"] [:th "Description"][:th "Data Updated"]]                            
                                          [:tr   [:td [:a {:href "/powerball"} "Powerball"]][:td " A source for Powerball numbers to play"][:td "N/A"]]
-                                         [:tr   [:td [:a {:href "/destiny"} "Destiny"]][:td "Data re: Star Wars Destiny card game"][:td "12/14/2017"]]])))
+                                         [:tr   [:td [:a {:href "/destiny"} "Destiny"]][:td "Data re: Star Wars Destiny card game"][:td "12/15/2017"]]
+                                         [:tr   [:td [:a {:href "/discogs"} "Discogs"][:td "Data re: albums I've cataloged on Discogs (stored locally)"][:td "12/16/2017"]]]]))) ;]]])))
                                         
                                     
                                          
@@ -72,9 +74,9 @@
   
   (ANY "/serialism" [] serialism)
   
-  destiny-routes)
+  destiny-routes
   
-  ;;discogs-routes)
+  discogs-routes)
 
 (def app
   (wrap-params app-routes))
