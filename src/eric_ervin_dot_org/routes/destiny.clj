@@ -11,29 +11,19 @@
                                           padding: 3px;
                                          }
                                          "])
-                                         
+(defn map-html-table-td [cl]
+  (if (some? cl)
+      (if (clojure.string/includes? cl "http") (html [:td [:a {:href cl} cl]]) (html [:td cl]))
+      (html [:td])))    
 
-(defn map-html-table-td-row [mp]
-  (html [:tr (map #(html [:td (second %)]) mp)]))
-
-(defn cards-html [qry] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/destiny.db"}
-                             all-cards (sql/query db-spec [qry])
-                             card-rows (map #(html [:tr [:td (:cardset %)] [:td (:position %)][:td (:name %)][:td (:typename %)]
-                                                        [:td (:isunique %)][:td (:rarity %)][:td (:affiliation %)][:td (:faction %)]
-                                                        [:td (:cminpoints %)][:td (:cmaxpoints %)][:td (:chealth %)][:td [:a {:href (:imgsrc %)} (:imgsrc %)]]]) all-cards)]
-                         
-                         (html  html-style-css
-                                [:h1 [:table 
-                                      [:tr [:th "Set"] [:th "Position"] [:th "Name"][:th "Type"][:th "Is Unique"][:th "Rarity"][:th "Affiliation"] [:th "Faction"][:th "Min Cost"][:th "Max Cost"][:th "Health"][:th "Img Source"]]
-                                      card-rows]])))
-
-
+(defn map-html-table-tr [mp]
+  (html [:tr (map map-html-table-td mp)]))
 
 (defn reports-html [qry-map] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/destiny.db"}
                                    qry (:query qry-map)
                                    header (:header qry-map)
-                                   results (sql/query db-spec [qry])
-                                   report-rows (map map-html-table-td-row results)]
+                                   results (sql/query db-spec [qry] {:as-arrays? true})
+                                   report-rows (map map-html-table-tr (rest results))]
                                (html html-style-css
                                  [:table 
                                   [:tr (map #(html [:th %]) header)]
@@ -70,25 +60,35 @@
                                     [:h4 "Reports"]
                                     [:table
                                      [:tr [:th "Count by Affiliation/Faction"][:td [:a {:href "/destiny/reports?rpt=affiliation_faction_count"} "HTML"]]]
-                                     [:tr [:th "Count by Set"][:td [:a {:href "/destiny/reports?rpt=set_count"} "HTML"]]]])))
+                                     [:tr [:th "Count by Set"][:td [:a {:href "/destiny/reports?rpt=set_count"} "HTML"]]]
+                                     [:tr [:th "Highest Cost Support/Event/Upgrade"][:td [:a {:href "/destiny/reports?rpt=high_cost"} "HTML"]]]])))
 
 (defn cards-query [ctx] 
   (let [affil (get-in ctx [:request :params "affil"])
         fact (get-in ctx [:request :params "fact"])
-        qry-str (cond (and (nil? affil) (nil? fact)) "Select * from card"
-                      (and (nil? affil) (some? fact)) (str "Select * from card where faction = \"" fact "\"")
-                      (and (some? affil) (nil? fact)) (str "Select * from card where affiliation = \"" affil "\"")
-                      :else (str "Select * from card where affiliation = \"" affil "\" and faction = \"" fact "\""))]
-  
-   (cards-html qry-str)))
+        select-fields "cardset, position, name, typename, isunique, rarity, affiliation, faction, cminpoints, cmaxpoints, chealth, imgsrc"
+        qry-str (cond (and (nil? affil) (nil? fact))  (str "Select " select-fields " from card")
+                      (and (nil? affil) (some? fact)) (str "Select " select-fields " from card where faction = \"" fact "\"")
+                      (and (some? affil) (nil? fact)) (str "Select " select-fields " from card where affiliation = \"" affil "\"")
+                      :else (str "Select " select-fields " from card where affiliation = \"" affil "\" and faction = \"" fact "\""))
+        qry-map {:header ["Set" "Position" "Name" "Type" "Is Unique" "Rarity" "Affiliation" "Faction" 
+                          "Min Cost" "Max Cost" "Health" "Img Source"]
+                 :query qry-str}]       
+       (reports-html qry-map)))
 
 (defn report-query [ctx] 
-       (if-let [qry-map (cond (= (get-in ctx [:request :params "rpt"]) "affiliation_faction_count") 
+       (if-let [qry-map (condp = (get-in ctx [:request :params "rpt"])  
+                              "affiliation_faction_count" 
                               {:header ["Affilliation" "Faction" "Count"] 
                                :query "Select affiliation, faction, count(*) as count from card group by affiliation, faction"}
-                              (= (get-in ctx [:request :params "rpt"]) "set_count") 
-                              {:header ["Set" "Count"] 
-                               :query "Select cardset, count(*) as count from card group by cardset"})]  
+                              "set_count" 
+                               {:header ["Set" "Count"] 
+                                :query "Select cardset, count(*) as count from card group by cardset"}
+                              "high_cost" 
+                               {:header ["Set" "Position" "Name" "Type" "Is Unique" "Rarity" "Cost"] 
+                                :query "Select cardset, position, name, typename, isunique, rarity, ccost 
+                                        from card where ccost is not null 
+                                        order by ccost desc"})]         
          (reports-html qry-map)))
 
 (defresource res-cards [ctx] :allowed-methods [:get :options] :available-media-types ["text/html"] :handle-ok cards-query)
