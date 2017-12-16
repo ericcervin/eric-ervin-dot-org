@@ -5,32 +5,79 @@
             [hiccup.core :refer [html]]
             [clojure.java.jdbc :as sql]))
             
+(def html-style-css [:style "table,th,td {border: 1px solid black;
+                                          border-collapse: collapse;
+                                          padding: 3px;
+                                          text-align: left
+                     }
+                     "])
+(defn map-html-table-td [cl]
+  (if (some? cl)
+      (if (clojure.string/includes? cl "http") (html [:td [:a {:href cl} cl]]) (html [:td cl]))
+      (html [:td])))    
+
+(defn map-html-table-tr [mp]
+  (html [:tr (map map-html-table-td mp)]))
+
+(defn reports-html [qry-map] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/discogs.db"}
+                                   qry (:query qry-map)
+                                   header (:header qry-map)
+                                   results (sql/query db-spec [qry] {:as-arrays? true})
+                                   report-rows (map map-html-table-tr (rest results))]
+                               (html html-style-css
+                                 [:table 
+                                  [:tr (map #(html [:th %]) header)]
+                                  report-rows])))
+
+(defn releases-query [ctx] 
+  (let [sort (get-in ctx [:request :params "sort"])
+        select-fields "title, artist, label, year"
+        qry-str (if (some? sort) (str "Select " select-fields " from release order by " sort)
+                                 (str "Select " select-fields " from release order by artist"))
+        qry-map {:header ["Title" "Artist" "Label" "Release Year"]
+                 :query qry-str}]       
+   (reports-html qry-map)))
 
 
-(defn releases_html [ctx] (let [db-spec {:classname "org.sqlite.JDBC"
-                                         :subprotocol "sqlite"
-                                         :subname "resources/discogs.db"}
-                                all-releases (sql/query db-spec ["Select * from release order by artist"])
-                                release-rows (map #(html [:tr [:td (:title %)] [:td (:artist %)][:td (:label %)][:td (:year %)]]) all-releases)]
-                            (html [:h6 [:style "table,th,td {
-                                        border: 1px solid black;
-                                        border-collapse: collapse;
-                                        padding: 5px;
-                                        }
-                                        "]; 
-                                   [:table 
-                                    [:tr [:th "Title"] [:th "Artist"] [:th "Label"][:th "Year"]]
-                                    release-rows]])))
 
-
-(defresource res-releases-html [ctx]
+(defresource res-discogs [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok releases_html)
+             :handle-ok (fn [ctx] (html html-style-css
+                                        [:h4 "Releases"]
+                                        [:table
+                                         [:tr [:th ""] [:th "By Title"][:th "By Artist"][:th "By Label"][:th "By Release Year"]]
+                                         [:tr [:th "All"]     [:td [:a {:href "http://localhost/discogs/releases?sort=title"} "HTML"]]
+                                                              [:td [:a {:href "http://localhost/discogs/releases?sort=artist"} "HTML"]]
+                                                              [:td [:a {:href "http://localhost/discogs/releases?sort=label"} "HTML"]] 
+                                                              [:td [:a {:href "http://localhost/discogs/releases?sort=year"} "HTML"]]]]
+                                        
+                                    [:h4 "Reports"]
+                                    [:table
+                                     [:tr [:th "Count by Artist"][:td [:a {:href "http://localhost/discogs/reports?rpt=artist_count"} "HTML"]]]
+                                     [:tr [:th "Count by Label"][:td [:a {:href "http://localhost/discogs/reports?rpt=label_count"} "HTML"]]]
+                                     [:tr [:th "Count by Year"][:td [:a {:href "http://localhost/discogs/reports?rpt=year_count"} "HTML"]]]])))
+
+(defn report-query [ctx] 
+       (if-let [qry-map (condp = (get-in ctx [:request :params "rpt"])  
+                              "artist_count" 
+                              {:header ["Artist" "Count"] 
+                               :query "Select artist, count(*) as count from release group by artist order by count(*) DESC"}
+                              "label_count"
+                              {:header ["Label" "Count"] 
+                               :query "Select label, count(*) as count from release group by label order by count(*) DESC"}
+                              "year_count"
+                              {:header ["Year Released" "Count"] 
+                               :query "Select year, count(*) as count from release group by year order by count(*) DESC"})] 
+                                        
+         (reports-html qry-map)))
+
+(defresource res-releases [ctx] :allowed-methods [:get :options] :available-media-types ["text/html"] :handle-ok releases-query)
+(defresource res-reports [ctx] :allowed-methods [:get :options] :available-media-types ["text/html"] :handle-ok report-query)
 
 (defroutes discogs-routes  
-  ;;(ANY "/discogs" [] res-discogs)
-  (ANY "/discogs/releases/html" [] res-releases-html))
-  ;;(ANY "/discogs/releases/json" [] res-releases-json)
-  ;;(ANY "/discogs/releases/text" [] res-releases-text))
+  (ANY "/discogs" [] res-discogs)
+  (ANY "/discogs/releases" [] res-releases)
+  (ANY "/discogs/reports" [] res-reports))
+  
   
