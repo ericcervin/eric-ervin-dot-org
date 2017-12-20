@@ -10,6 +10,13 @@
   :ring {:handler eric-ervin-dot-org.handler/app
          :auto-reload true
          :auto-refresh true
-         :port 80})
+         :port 80}
+  :profiles
+  {:uberjar {:aot :all}
+   :production
+   {:ring
+    {:open-browser? false, :stacktraces? false, :auto-reload? false}}
+   :dev
+   {:dependencies [[ring-mock "0.1.5"] [ring/ring-devel "1.5.1"]]}})
   
   
