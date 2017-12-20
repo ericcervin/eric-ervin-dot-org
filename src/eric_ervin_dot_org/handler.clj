@@ -49,7 +49,7 @@
                                         [:table
                                          [:tr   [:th "Resource"] [:th "Description"][:th "Data Updated"]]                            
                                          [:tr   [:td [:a {:href "/powerball"} "Powerball"]][:td " A source for Powerball numbers to play"][:td "N/A"]]
-                                         [:tr   [:td [:a {:href "/destiny"} "Destiny"]][:td "Data re: Star Wars Destiny card game"][:td "12/15/2017"]]
+                                         [:tr   [:td [:a {:href "/destiny"} "Destiny"]][:td "Data re: Star Wars Destiny card game"][:td "12/19/2017"]]
                                          [:tr   [:td [:a {:href "/discogs"} "Discogs"][:td "Data re: albums I've cataloged on Discogs (stored locally)"][:td "12/16/2017"]]]]))) ;]]])))
                                         
                                     
