@@ -15,7 +15,7 @@
 
 (defn powerball-row-map []
   (let [white-balls (vec (take 5 (shuffle (range 1 70))))
-        pb (+ 1 (rand-int 69))
+        pb (+ 1 (rand-int 26))
         pb-r-map (zipmap [:ball-1 :ball-2 :ball-3 :ball-4 :ball-5] white-balls)
         pb-r-map (assoc pb-r-map :pb pb)]
     pb-r-map))       
