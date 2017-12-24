@@ -6,7 +6,8 @@
             [clojure.java.jdbc :as sql]
             [eric-ervin-dot-org.routes.powerball :refer [powerball-routes]]
             [eric-ervin-dot-org.routes.discogs   :refer [discogs-routes]]
-            [eric-ervin-dot-org.routes.destiny   :refer [destiny-routes]]))
+            [eric-ervin-dot-org.routes.destiny   :refer [destiny-routes]]
+            [eric-ervin-dot-org.routes.philosophy-usa   :refer [philosophy-routes]]))
 
 (def html-style-css [:style "table,th,td {
                                           border: 1px solid black;
@@ -44,14 +45,14 @@
              :handle-ok (fn [ctx] (html html-style-css
                                          
                                         [:h4 [:p "A toy website to release some Clojure into the world." [:br]
-                                                 "Though it's a toy, these are resources I use."]
+                                                 "Though it's a toy, these are resources I use. (Except that I've quit playing Powerball)"]
                                          [:a {:href "https://github.com/ericcervin/eric-ervin-dot-org"} "https://github.com/ericcervin/eric-ervin-dot-org"]]
                                         [:table
-                                         [:tr   [:th "Resource"] [:th "Description"][:th "Data Updated"]]                            
-                                         [:tr   [:td [:a {:href "/powerball"} "Powerball"]][:td " A source for Powerball numbers to play"][:td "N/A"]]
-                                         [:tr   [:td [:a {:href "/destiny"} "Destiny"]][:td "Data re: Star Wars Destiny card game"][:td "12/19/2017"]]
-                                         [:tr   [:td [:a {:href "/discogs"} "Discogs"][:td "Data re: albums I've cataloged on Discogs (stored locally)"][:td "12/16/2017"]]]]))) ;]]])))
-                                        
+                                         [:tr   [:th "Resource"] [:th "Description"][:th "Data Updated"]]                                  
+                                         [:tr   [:td [:a {:href "/destiny"} "Destiny"]][:td "Star Wars Destiny card game data"][:td "12/22/2017"]]
+                                         [:tr   [:td [:a {:href "/discogs"} "Discogs"][:td "Albums I've cataloged on Discogs (stored locally)"][:td "12/16/2017"]]]
+                                         [:tr   [:td [:a {:href "/philosophy"} "Philosophy"][:td "Philosophy degrees completed during the 2014-2015 academic year."][:td "12/23/2017"]]] ;]]])))
+                                         [:tr   [:td [:a {:href "/powerball"} "Powerball"]][:td " A source for Powerball numbers to play"][:td "N/A"]]])))
                                     
                                          
 (defresource serialism [ctx]
@@ -76,7 +77,9 @@
   
   destiny-routes
   
-  discogs-routes)
+  discogs-routes
+  
+  philosophy-routes)
 
 (def app
   (wrap-params app-routes))
