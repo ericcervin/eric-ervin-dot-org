@@ -54,9 +54,16 @@
                                        from completion cmp 
                                        join cipcode chp on cmp.cip = chp.cipcode
                                        group by cipcode, ciptitle
-                                       order by count(*) DESC"})]
-                               
-                                        
+                                       order by count(*) DESC"}
+                                
+                              "awlevel_count"
+                              {:header ["Code" "Level" "Count"] 
+                               :query "Select alcode, alvalue, Count(*) 
+                                       from alcode join completion
+                                       on alcode.alcode = completion.awlevel
+                                       group by alcode, alvalue"})]
+         
+         
          (reports-html qry-map)))
 
 (defresource res-reports [ctx] :allowed-methods [:get :options] :available-media-types ["text/html"] :handle-ok report-query)
@@ -73,6 +80,7 @@
                                         [:h4 [:a {:href "https://nces.ed.gov/ipeds/Home/UseTheData"} "https://nces.ed.gov/ipeds/Home/UseTheData"]]
                                         [:h4 "Reports"]
                                     [:table
+                                     [:tr [:th "Philosophy Degrees Completed by Award Level"][:td [:a {:href "/philosophy/reports?rpt=awlevel_count"} "HTML"]]]                                    
                                      [:tr [:th "Philosophy Degrees Completed by Institution"][:td [:a {:href "/philosophy/reports?rpt=inst_count"} "HTML"]]]
                                      [:tr [:th "Philosophy Degrees Completed by State"][:td [:a {:href "/philosophy/reports?rpt=state_count"} "HTML"]]]
                                      [:tr [:th "Philosophy Degrees Completed by Subject Classification"][:td [:a {:href "/philosophy/reports?rpt=cip_count"} "HTML"]]]])))
