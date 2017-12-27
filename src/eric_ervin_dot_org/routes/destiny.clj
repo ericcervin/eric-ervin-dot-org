@@ -5,12 +5,12 @@
             [hiccup.core :refer [html]]
             [clojure.java.jdbc :as sql]))
 
-(def html-style-css [:style "table,th,td {
-                                          border: 1px solid black;
+(def html-style-css [:style "table,th,td {border: 1px solid black;
                                           border-collapse: collapse;
                                           padding: 3px;
-                                         }
-                                         "])
+                                          text-align: left
+                     }
+                     "])
 (defn map-html-table-td [cl]
   (if (some? cl)
       (if (clojure.string/includes? cl "http") (html [:td [:a {:href cl} cl]]) (html [:td cl]))
@@ -59,9 +59,12 @@
                                     
                                     [:h4 "Reports"]
                                     [:table
+                                     [:tr [:th "Compatible with Villain/Command"][:td [:a {:href "/destiny/reports?rpt=villain_command_compatible"} "HTML"]]]
                                      [:tr [:th "Count by Affiliation/Faction"][:td [:a {:href "/destiny/reports?rpt=affiliation_faction_count"} "HTML"]]]
+                                     [:tr [:th "Count by Rarity"][:td [:a {:href "/destiny/reports?rpt=rarity_count"} "HTML"]]]
                                      [:tr [:th "Count by Set"][:td [:a {:href "/destiny/reports?rpt=set_count"} "HTML"]]]
-                                     [:tr [:th "Highest Cost Support/Event/Upgrade"][:td [:a {:href "/destiny/reports?rpt=high_cost"} "HTML"]]]])))
+                                     [:tr [:th "Highest Cost Support/Event/Upgrade"][:td [:a {:href "/destiny/reports?rpt=high_cost"} "HTML"]]]
+                                     [:tr [:th "Legendary Rarity Cards"][:td [:a {:href "/destiny/reports?rpt=legendary"} "HTML"]]]])))
 
 (defn cards-query [ctx] 
   (let [affil (get-in ctx [:request :params "affil"])
@@ -81,14 +84,30 @@
                               "affiliation_faction_count" 
                               {:header ["Affilliation" "Faction" "Count"] 
                                :query "Select affiliation, faction, count(*) as count from card group by affiliation, faction"}
+                              "rarity_count" 
+                              {:header ["Rarity" "Count"] 
+                               :query "Select rarity, count(*) as count from card group by rarity"}
                               "set_count" 
-                               {:header ["Set" "Count"] 
-                                :query "Select cardset, count(*) as count from card group by cardset"}
+                              {:header ["Set" "Count"] 
+                               :query "Select cardset, count(*) as count from card group by cardset"}
                               "high_cost" 
                                {:header ["Set" "Position" "Name" "Type" "Is Unique" "Rarity" "Cost"] 
                                 :query "Select cardset, position, name, typename, isunique, rarity, ccost 
                                         from card where ccost is not null 
-                                        order by ccost desc"})]         
+                                        order by ccost desc"}
+                               "legendary" 
+                               {:header ["Set" "Position" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost"] 
+                                :query "Select cardset, position, name, typename, affiliation, faction, isunique, rarity, ccost 
+                                        from card where rarity = \"Legendary\" 
+                                        "}
+                               "villain_command_compatible"
+                               {:header ["Set" "Position" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost"] 
+                                :query "Select cardset, position, name, typename, affiliation, faction, isunique, rarity, ccost 
+                                        from card where (affiliation = \"Villain\" or affiliation = \"Neutral\" ) 
+                                                    and (faction = \"Command\" or faction = \"General\") 
+                                        "})]
+                                        
+                                   
          (reports-html qry-map)))
 
 (defresource res-cards [ctx] :allowed-methods [:get :options] :available-media-types ["text/html"] :handle-ok cards-query)
