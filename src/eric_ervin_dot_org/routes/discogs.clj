@@ -45,18 +45,19 @@
              :available-media-types ["text/html"]
              :handle-ok (fn [ctx] (html html-style-css
                                         [:h4 "Releases"]
-                                        [:table
-                                         [:tr [:th ""] [:th "By Title"][:th "By Artist"][:th "By Label"][:th "By Release Year"]]
-                                         [:tr [:th "All"]     [:td [:a {:href "http://localhost/discogs/releases?sort=title"} "HTML"]]
-                                                              [:td [:a {:href "http://localhost/discogs/releases?sort=artist"} "HTML"]]
-                                                              [:td [:a {:href "http://localhost/discogs/releases?sort=label"} "HTML"]] 
-                                                              [:td [:a {:href "http://localhost/discogs/releases?sort=year"} "HTML"]]]]
-                                        
+                                    [:table
+                                     [:tr [:th ""] [:th "By Title"][:th "By Artist"][:th "By Label"][:th "By Release Year"]]
+                                     [:tr [:th "All"]     [:td [:a {:href "/discogs/releases?sort=title"} "HTML"]]
+                                      [:td [:a {:href "/discogs/releases?sort=artist"} "HTML"]]
+                                      [:td [:a {:href "/discogs/releases?sort=label"} "HTML"]] 
+                                      [:td [:a {:href "/discogs/releases?sort=year"} "HTML"]]]]
+                                    
                                     [:h4 "Reports"]
                                     [:table
-                                     [:tr [:th "Count by Artist"][:td [:a {:href "http://localhost/discogs/reports?rpt=artist_count"} "HTML"]]]
-                                     [:tr [:th "Count by Label"][:td [:a {:href "http://localhost/discogs/reports?rpt=label_count"} "HTML"]]]
-                                     [:tr [:th "Count by Year"][:td [:a {:href "http://localhost/discogs/reports?rpt=year_count"} "HTML"]]]])))
+                                     [:tr [:th "Count by Artist"][:td [:a {:href "/discogs/reports?rpt=artist_count"} "HTML"]]]
+                                     [:tr [:th "Count by Label"][:td [:a {:href "/discogs/reports?rpt=label_count"} "HTML"]]]
+                                     [:tr [:th "Count by Year/Month Cataloged"][:td [:a {:href "/discogs/reports?rpt=year_month_added"} "HTML"]]]
+                                     [:tr [:th "Count by Year Released"][:td [:a {:href "/discogs/reports?rpt=year_count"} "HTML"]]]])))
 
 (defn report-query [ctx] 
        (if-let [qry-map (condp = (get-in ctx [:request :params "rpt"])  
@@ -68,8 +69,13 @@
                                :query "Select label, count(*) as count from release group by label order by count(*) DESC"}
                               "year_count"
                               {:header ["Year Released" "Count"] 
-                               :query "Select year, count(*) as count from release group by year order by count(*) DESC"})] 
-                                        
+                               :query "Select year, count(*) as count from release group by year order by count(*) DESC"}
+                              "year_month_added"
+                              {:header ["Year Added" "Month Added" "Count"]
+                               :query "Select substr(dateadded,0,5), substr(dateadded,6,2), Count(*) 
+                                       from release group by substr(dateadded,0,5), substr(dateadded,6,2)
+                                       order by substr(dateadded,0,5) DESC, substr(dateadded,6,2) DESC"})] 
+         
          (reports-html qry-map)))
 
 (defresource res-releases [ctx] :allowed-methods [:get :options] :available-media-types ["text/html"] :handle-ok releases-query)
