@@ -74,16 +74,19 @@
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
              :handle-ok (fn [ctx] (html html-style-css
-                                        [:h4 "Philosophy and religious studies degrees completed during the 2014-2015 academic year. <br> 
-                                              Data taken from the Integrated Postsecondary Education Data System (IPEDS) <br>"]
-                                              
-                                        [:h4 [:a {:href "https://nces.ed.gov/ipeds/Home/UseTheData"} "https://nces.ed.gov/ipeds/Home/UseTheData"]]
-                                        [:h4 "Reports"]
+                                   [:div {:id "header"}
+                                    [:h3 "Philosopy USA"]
+                                    [:p "Philosophy and religious studies degrees completed during the 2014-2015 academic year."] 
+                                    [:p "Data taken from the Integrated Postsecondary Education Data System (IPEDS)"]
+                                    [:p [:a {:href "https://nces.ed.gov/ipeds/Home/UseTheData"} "https://nces.ed.gov/ipeds/Home/UseTheData"]]]
+                                   
+                                   [:div {:id "reports"}          
+                                    [:h4 "Reports"]
                                     [:table
                                      [:tr [:th "Philosophy Degrees Completed by Award Level"][:td [:a {:href "/philosophy/reports?rpt=awlevel_count"} "HTML"]]]                                    
                                      [:tr [:th "Philosophy Degrees Completed by Institution"][:td [:a {:href "/philosophy/reports?rpt=inst_count"} "HTML"]]]
                                      [:tr [:th "Philosophy Degrees Completed by State"][:td [:a {:href "/philosophy/reports?rpt=state_count"} "HTML"]]]
-                                     [:tr [:th "Philosophy Degrees Completed by Subject Classification"][:td [:a {:href "/philosophy/reports?rpt=cip_count"} "HTML"]]]])))
+                                     [:tr [:th "Philosophy Degrees Completed by Subject Classification"][:td [:a {:href "/philosophy/reports?rpt=cip_count"} "HTML"]]]]])))
                                      
                                         
 

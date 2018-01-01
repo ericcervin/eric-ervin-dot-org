@@ -44,20 +44,26 @@
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
              :handle-ok (fn [ctx] (html html-style-css
-                                        [:h4 "Releases"]
-                                    [:table
-                                     [:tr [:th ""] [:th "By Title"][:th "By Artist"][:th "By Label"][:th "By Release Year"]]
-                                     [:tr [:th "All"]     [:td [:a {:href "/discogs/releases?sort=title"} "HTML"]]
-                                      [:td [:a {:href "/discogs/releases?sort=artist"} "HTML"]]
-                                      [:td [:a {:href "/discogs/releases?sort=label"} "HTML"]] 
-                                      [:td [:a {:href "/discogs/releases?sort=year"} "HTML"]]]]
+                                    [:div {:id "header"}
+                                     [:h3 "My Record Collection"]]
                                     
-                                    [:h4 "Reports"]
-                                    [:table
-                                     [:tr [:th "Count by Artist"][:td [:a {:href "/discogs/reports?rpt=artist_count"} "HTML"]]]
-                                     [:tr [:th "Count by Label"][:td [:a {:href "/discogs/reports?rpt=label_count"} "HTML"]]]
-                                     [:tr [:th "Count by Year/Month Cataloged"][:td [:a {:href "/discogs/reports?rpt=year_month_added"} "HTML"]]]
-                                     [:tr [:th "Count by Year Released"][:td [:a {:href "/discogs/reports?rpt=year_count"} "HTML"]]]])))
+                                    [:div {:id "releases"}
+                                   
+                                     [:h4 "Releases"]
+                                     [:table
+                                      [:tr [:th ""] [:th "By Title"][:th "By Artist"][:th "By Label"][:th "By Release Year"]]
+                                      [:tr [:th "All"]     [:td [:a {:href "/discogs/releases?sort=title"} "HTML"]]
+                                       [:td [:a {:href "/discogs/releases?sort=artist"} "HTML"]]
+                                       [:td [:a {:href "/discogs/releases?sort=label"} "HTML"]] 
+                                       [:td [:a {:href "/discogs/releases?sort=year"} "HTML"]]]]]
+                                    
+                                    [:div {:id "reports"}
+                                     [:h4 "Reports"]
+                                     [:table
+                                      [:tr [:th "Count by Artist"][:td [:a {:href "/discogs/reports?rpt=artist_count"} "HTML"]]]
+                                      [:tr [:th "Count by Label"][:td [:a {:href "/discogs/reports?rpt=label_count"} "HTML"]]]
+                                      [:tr [:th "Count by Year/Month Cataloged"][:td [:a {:href "/discogs/reports?rpt=year_month_added"} "HTML"]]]
+                                      [:tr [:th "Count by Year Released"][:td [:a {:href "/discogs/reports?rpt=year_count"} "HTML"]]]]])))
 
 (defn report-query [ctx] 
        (if-let [qry-map (condp = (get-in ctx [:request :params "rpt"])  

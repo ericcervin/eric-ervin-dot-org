@@ -53,13 +53,15 @@
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
              :handle-ok (fn [ctx] (html html-style-css
-                                         
-                                        [:h4 "Two sets of Powerball numbers"]
-                                        [:table
-                                                             
-                                         [:tr [:td [:a {:href "/powerball/html"} "HTML"]]]
-                                         [:tr [:td [:a {:href "/powerball/json"} "JSON"]]]
-                                         [:tr [:td [:a {:href "/powerball/text"} "TEXT"]]]])))
+                                        [:div {:id "header"}
+                                         [:h3 "Powerball"]
+                                         [:p "Two sets of Powerball numbers"]]
+                                        [:div {:id "numbers"}
+                                         [:table
+                                          [:th "Numbers"]
+                                          [:tr [:td [:a {:href "/powerball/html"} "HTML"]]]
+                                          [:tr [:td [:a {:href "/powerball/json"} "JSON"]]]
+                                          [:tr [:td [:a {:href "/powerball/text"} "TEXT"]]]]])))
 
 (defresource res-powerball-html [ctx]
              :allowed-methods [:get :options]
