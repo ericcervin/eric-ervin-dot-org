@@ -43,16 +43,19 @@
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
              :handle-ok (fn [ctx] (html html-style-css
-                                         
-                                        [:h4 [:p "A toy website to release some Clojure into the world." [:br]
-                                                 "Though it's a toy, these are resources I use. (Except that I've quit playing Powerball)"]
-                                         [:a {:href "https://github.com/ericcervin/eric-ervin-dot-org"} "https://github.com/ericcervin/eric-ervin-dot-org"]]
+                                      [:div {:id "header"}   
+                                         [:p "A toy website to release some Clojure into the world."]
+                                         [:p "Though it's a toy, these are resources I use. (Except that I've quit playing Powerball)"]
+                                         [:p [:a {:href "https://github.com/ericcervin/eric-ervin-dot-org"} "https://github.com/ericcervin/eric-ervin-dot-org"]][:br]]
+                                       
+                                      
+                                      [:div {:id "resources"}
                                         [:table
-                                         [:tr   [:th "Resource"] [:th "Description"][:th "Data Updated"]]                                  
-                                         [:tr   [:td [:a {:href "/destiny"} "Destiny"]][:td "Star Wars Destiny card game data"][:td "12/22/2017"]]
-                                         [:tr   [:td [:a {:href "/discogs"} "Discogs"][:td "Albums I've cataloged on Discogs (stored locally)"][:td "12/16/2017"]]]
-                                         [:tr   [:td [:a {:href "/philosophy"} "Philosophy"][:td "Philosophy degrees completed during the 2014-2015 academic year."][:td "12/23/2017"]]] ;]]])))
-                                         [:tr   [:td [:a {:href "/powerball"} "Powerball"]][:td " A source for Powerball numbers to play"][:td "N/A"]]])))
+                                          [:tr   [:th "Resource"] [:th "Description"][:th "Data Updated"]]                                  
+                                          [:tr   [:td [:a {:href "/destiny"} "Destiny"]][:td "Star Wars Destiny card game data"][:td "12/22/2017"]]
+                                          [:tr   [:td [:a {:href "/discogs"} "Discogs"][:td "Albums I've cataloged"][:td "12/16/2017"]]]
+                                          [:tr   [:td [:a {:href "/philosophy"} "Philosophy"][:td "Philosophy degrees completed during the 2014-2015 academic year."][:td "12/23/2017"]]] ;]]])))
+                                          [:tr   [:td [:a {:href "/powerball"} "Powerball"]][:td " A source for Powerball numbers to play"][:td "N/A"]]]])))
                                     
                                          
 (defresource serialism [ctx]
