@@ -68,6 +68,7 @@
                                     [:div {:id "reports"}
                                      [:h4 "Reports"]
                                      [:table
+                                      [:tr [:th "Character Type Cards"][:td [:a {:href "/destiny/reports?rpt=character"} "HTML"]]]
                                       [:tr [:th "Compatible with Villain/Command"][:td [:a {:href "/destiny/reports?rpt=villain_command_compatible"} "HTML"]]]
                                       [:tr [:th "Count by Affiliation/Faction"][:td [:a {:href "/destiny/reports?rpt=affiliation_faction_count"} "HTML"]]]
                                       [:tr [:th "Count by Rarity"][:td [:a {:href "/destiny/reports?rpt=rarity_count"} "HTML"]]]
@@ -114,7 +115,12 @@
                                 :query "Select cardset, position, name, typename, affiliation, faction, isunique, rarity, ccost 
                                         from card where (affiliation = \"Villain\" or affiliation = \"Neutral\" ) 
                                                     and (faction = \"Command\" or faction = \"General\") 
-                                        "})]
+                                        "}
+                               "character"
+                               {:header ["Set" "Position" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "MinPoints" "MaxPoints" "Health" "Image"] 
+                                :query "Select cardset, position, name, typename, affiliation, faction, isunique, rarity, cminpoints, cmaxpoints, chealth, imgsrc 
+                                        from card where typename = \"Character\" 
+                                "})]
                                         
                                    
          (reports-html qry-map)))
