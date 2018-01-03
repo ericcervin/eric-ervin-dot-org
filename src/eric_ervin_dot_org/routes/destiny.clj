@@ -5,12 +5,20 @@
             [hiccup.core :refer [html]]
             [clojure.java.jdbc :as sql]))
 
-(def html-style-css [:style "table,th,td {border: 1px solid black;
+(def html-style-css [:style "table,th {
+                                          border: 1px solid black;
+                                          border-collapse: collapse;
+                                          padding: 3px;
+                                          text-align: center
+                                         }
+                             td {
+                                          border: 1px solid black;
                                           border-collapse: collapse;
                                           padding: 3px;
                                           text-align: left
-                     }
-                     "])
+                                         }
+                                         "])
+
 (defn map-html-table-td [cl]
   (if (some? cl)
       (if (clojure.string/includes? cl "http") (html [:td [:a {:href cl} cl]]) (html [:td cl]))
@@ -43,38 +51,41 @@
                                       [:h4 "Cards"]
                                       
                                       [:table
-                                       [:tr [:th ""] [:th "All"][:th "Villain"][:th "Hero"][:th "Neutral"]]
-                                       [:tr [:th "All"]     [:td [:a {:href "/destiny/cards?"} "HTML"]]
-                                        [:td [:a {:href "/destiny/cards?affil=Villain"} "HTML"]]
-                                        [:td [:a {:href "/destiny/cards?affil=Hero"} "HTML"]] 
-                                        [:td [:a {:href "/destiny/cards?affil=Neutral"} "HTML"]]]
-                                       [:tr [:th "Command"] [:td [:a {:href "/destiny/cards?fact=Command"} "HTML"]] 
-                                        [:td [:a {:href "/destiny/cards?affil=Villain&fact=Command"} "HTML"]]
-                                        [:td [:a {:href "/destiny/cards?affil=Hero&fact=Command"} "HTML"]]
-                                        [:td [:a {:href "/destiny/cards?affil=Neutral&fact=Command"} "HTML"]]]
-                                       [:tr [:th "Force"]   [:td [:a {:href "/destiny/cards?fact=Force"} "HTML"]]
-                                        [:td [:a {:href "/destiny/cards?affil=Villain&fact=Force"} "HTML"]]
-                                        [:td [:a {:href "/destiny/cards?affil=Hero&fact=Force"} "HTML"]]
-                                        [:td [:a {:href "/destiny/cards?affil=Neutral&fact=Force"} "HTML"]]]
-                                       [:tr [:th "Rogue"]   [:td [:a {:href "/destiny/cards?fact=Rogue"} "HTML"]]
-                                        [:td [:a {:href "/destiny/cards?affil=Villain&fact=Rogue"} "HTML"]]
-                                        [:td [:a {:href "/destiny/cards?affil=Hero&fact=Rogue"} "HTML"]]
-                                        [:td [:a {:href "/destiny/cards?affil=Neutral&fact=Rogue"} "HTML"]]]
-                                       [:tr [:th "General"] [:td [:a {:href "/destiny/cards?fact=General"} "HTML"]] 
-                                        [:td [:a {:href "/destiny/cards?affil=Villain&fact=General"} "HTML"]]
-                                        [:td [:a {:href "/destiny/cards?affil=Hero&fact=General"} "HTML"]]
-                                        [:td [:a {:href "/destiny/cards?affil=Neutral&fact=General"} "HTML"]]]]]
+                                       [:thead
+                                        [:tr [:th][:th][:th {:colspan "4"} "Affiliation"]]
+                                        [:tr [:th ""][:th ""] [:th {:scope "col"} "All"][:th {:scope "col"} "Villain"][:th {:scope "col"} "Hero"][:th {:scope "col"} "Neutral"]]]
+                                       [:tbody 
+                                        [:tr [:th {:rowspan "5"} "Faction"] [:th {:scope "row"} "All"]     [:td [:a {:href "/destiny/cards?"} "HTML"]]
+                                         [:td [:a {:href "/destiny/cards?affil=Villain"} "HTML"]]
+                                         [:td [:a {:href "/destiny/cards?affil=Hero"} "HTML"]] 
+                                         [:td [:a {:href "/destiny/cards?affil=Neutral"} "HTML"]]]
+                                        [:tr [:th {:scope "row"} "Command"] [:td [:a {:href "/destiny/cards?fact=Command"} "HTML"]] 
+                                         [:td [:a {:href "/destiny/cards?affil=Villain&fact=Command"} "HTML"]]
+                                         [:td [:a {:href "/destiny/cards?affil=Hero&fact=Command"} "HTML"]]
+                                         [:td [:a {:href "/destiny/cards?affil=Neutral&fact=Command"} "HTML"]]]
+                                        [:tr [:th {:scope "row"} "Force"]   [:td [:a {:href "/destiny/cards?fact=Force"} "HTML"]]
+                                         [:td [:a {:href "/destiny/cards?affil=Villain&fact=Force"} "HTML"]]
+                                         [:td [:a {:href "/destiny/cards?affil=Hero&fact=Force"} "HTML"]]
+                                         [:td [:a {:href "/destiny/cards?affil=Neutral&fact=Force"} "HTML"]]]
+                                        [:tr [:th {:scope "row"} "Rogue"]   [:td [:a {:href "/destiny/cards?fact=Rogue"} "HTML"]]
+                                         [:td [:a {:href "/destiny/cards?affil=Villain&fact=Rogue"} "HTML"]]
+                                         [:td [:a {:href "/destiny/cards?affil=Hero&fact=Rogue"} "HTML"]]
+                                         [:td [:a {:href "/destiny/cards?affil=Neutral&fact=Rogue"} "HTML"]]]
+                                        [:tr [:th {:scope "row"} "General"] [:td [:a {:href "/destiny/cards?fact=General"} "HTML"]] 
+                                         [:td [:a {:href "/destiny/cards?affil=Villain&fact=General"} "HTML"]]
+                                         [:td [:a {:href "/destiny/cards?affil=Hero&fact=General"} "HTML"]]
+                                         [:td [:a {:href "/destiny/cards?affil=Neutral&fact=General"} "HTML"]]]]]]
                                     
                                     [:div {:id "reports"}
                                      [:h4 "Reports"]
                                      [:table
-                                      [:tr [:th "Character Type Cards"][:td [:a {:href "/destiny/reports?rpt=character"} "HTML"]]]
-                                      [:tr [:th "Compatible with Villain/Command"][:td [:a {:href "/destiny/reports?rpt=villain_command_compatible"} "HTML"]]]
-                                      [:tr [:th "Count by Affiliation/Faction"][:td [:a {:href "/destiny/reports?rpt=affiliation_faction_count"} "HTML"]]]
-                                      [:tr [:th "Count by Rarity"][:td [:a {:href "/destiny/reports?rpt=rarity_count"} "HTML"]]]
-                                      [:tr [:th "Count by Set"][:td [:a {:href "/destiny/reports?rpt=set_count"} "HTML"]]]
-                                      [:tr [:th "Highest Cost Support/Event/Upgrade"][:td [:a {:href "/destiny/reports?rpt=high_cost"} "HTML"]]]
-                                      [:tr [:th "Legendary Rarity Cards"][:td [:a {:href "/destiny/reports?rpt=legendary"} "HTML"]]]]])))
+                                      [:tr [:td "Character Type Cards"][:td [:a {:href "/destiny/reports?rpt=character"} "HTML"]]]
+                                      [:tr [:td "Compatible with Villain/Command"][:td [:a {:href "/destiny/reports?rpt=villain_command_compatible"} "HTML"]]]
+                                      [:tr [:td "Count by Affiliation/Faction"][:td [:a {:href "/destiny/reports?rpt=affiliation_faction_count"} "HTML"]]]
+                                      [:tr [:td "Count by Rarity"][:td [:a {:href "/destiny/reports?rpt=rarity_count"} "HTML"]]]
+                                      [:tr [:td "Count by Set"][:td [:a {:href "/destiny/reports?rpt=set_count"} "HTML"]]]
+                                      [:tr [:td "Highest Cost Support/Event/Upgrade"][:td [:a {:href "/destiny/reports?rpt=high_cost"} "HTML"]]]
+                                      [:tr [:td "Legendary Rarity Cards"][:td [:a {:href "/destiny/reports?rpt=legendary"} "HTML"]]]]])))
 
 (defn cards-query [ctx] 
   (let [affil (get-in ctx [:request :params "affil"])

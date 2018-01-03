@@ -4,11 +4,17 @@
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [hiccup.core :refer [html]]))
 
-(def html-style-css [:style "table,th,td {
+(def html-style-css [:style "table,th {
                                           border: 1px solid black;
                                           border-collapse: collapse;
                                           padding: 3px;
-                                          text-align: left;
+                                          text-align: center
+                                         }
+                             td {
+                                          border: 1px solid black;
+                                          border-collapse: collapse;
+                                          padding: 3px;
+                                          text-align: left
                                          }
                                          "])
 
@@ -58,10 +64,12 @@
                                          [:p "Two sets of Powerball numbers"]]
                                         [:div {:id "numbers"}
                                          [:table
-                                          [:th "Numbers"]
-                                          [:tr [:td [:a {:href "/powerball/html"} "HTML"]]]
-                                          [:tr [:td [:a {:href "/powerball/json"} "JSON"]]]
-                                          [:tr [:td [:a {:href "/powerball/text"} "TEXT"]]]]])))
+                                          [:thead
+                                           [:th {:scope "col"} "Numbers"]]
+                                          [:tbody
+                                           [:tr [:td [:a {:href "/powerball/html"} "HTML"]]]
+                                           [:tr [:td [:a {:href "/powerball/json"} "JSON"]]]
+                                           [:tr [:td [:a {:href "/powerball/text"} "TEXT"]]]]]])))
 
 (defresource res-powerball-html [ctx]
              :allowed-methods [:get :options]

@@ -5,12 +5,19 @@
             [hiccup.core :refer [html]]
             [clojure.java.jdbc :as sql]))
             
-(def html-style-css [:style "table,th,td {border: 1px solid black;
+(def html-style-css [:style "table,th {
+                                          border: 1px solid black;
+                                          border-collapse: collapse;
+                                          padding: 3px;
+                                          text-align: center
+                                         }
+                             td {
+                                          border: 1px solid black;
                                           border-collapse: collapse;
                                           padding: 3px;
                                           text-align: left
-                     }
-                     "])
+                                         }
+                                         "])
 (defn map-html-table-td [cl]
   (if (some? cl)
       (if (clojure.string/includes? cl "http") (html [:td [:a {:href cl} cl]]) (html [:td cl]))
@@ -51,19 +58,25 @@
                                    
                                      [:h4 "Releases"]
                                      [:table
-                                      [:tr [:th ""] [:th "By Title"][:th "By Artist"][:th "By Label"][:th "By Release Year"]]
-                                      [:tr [:th "All"]     [:td [:a {:href "/discogs/releases?sort=title"} "HTML"]]
-                                       [:td [:a {:href "/discogs/releases?sort=artist"} "HTML"]]
-                                       [:td [:a {:href "/discogs/releases?sort=label"} "HTML"]] 
-                                       [:td [:a {:href "/discogs/releases?sort=year"} "HTML"]]]]]
+                                      [:thead
+                                       [:tr [:th ""] [:th {:scope "col"} "By Title"][:th {:scope "col"} "By Artist"][:th {:scope "col"} "By Label"][:th {:scope "col"} "By Release Year"]]]
+                                      [:tbody
+                                       [:tr [:th "All"]     
+                                        [:td [:a {:href "/discogs/releases?sort=title"} "HTML"]]
+                                        [:td [:a {:href "/discogs/releases?sort=artist"} "HTML"]]
+                                        [:td [:a {:href "/discogs/releases?sort=label"} "HTML"]] 
+                                        [:td [:a {:href "/discogs/releases?sort=year"} "HTML"]]]]]]
                                     
                                     [:div {:id "reports"}
                                      [:h4 "Reports"]
                                      [:table
-                                      [:tr [:th "Count by Artist"][:td [:a {:href "/discogs/reports?rpt=artist_count"} "HTML"]]]
-                                      [:tr [:th "Count by Label"][:td [:a {:href "/discogs/reports?rpt=label_count"} "HTML"]]]
-                                      [:tr [:th "Count by Year/Month Cataloged"][:td [:a {:href "/discogs/reports?rpt=year_month_added"} "HTML"]]]
-                                      [:tr [:th "Count by Year Released"][:td [:a {:href "/discogs/reports?rpt=year_count"} "HTML"]]]]])))
+                                      [:thead
+                                       [:tr [:th {:scope "col"} "Report"][:th {:scope "col"} "Format"]]]
+                                      [:tbody
+                                       [:tr [:td "Count by Artist"][:td [:a {:href "/discogs/reports?rpt=artist_count"} "HTML"]]]
+                                       [:tr [:td "Count by Label"][:td [:a {:href "/discogs/reports?rpt=label_count"} "HTML"]]]
+                                       [:tr [:td "Count by Year/Month Cataloged"][:td [:a {:href "/discogs/reports?rpt=year_month_added"} "HTML"]]]
+                                       [:tr [:td "Count by Year Released"][:td [:a {:href "/discogs/reports?rpt=year_count"} "HTML"]]]]]])))
 
 (defn report-query [ctx] 
        (if-let [qry-map (condp = (get-in ctx [:request :params "rpt"])  

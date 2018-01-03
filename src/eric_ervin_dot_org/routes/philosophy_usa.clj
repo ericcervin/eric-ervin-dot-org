@@ -5,12 +5,19 @@
             [hiccup.core :refer [html]]
             [clojure.java.jdbc :as sql]))
 
-(def html-style-css [:style "table,th,td {border: 1px solid black;
+(def html-style-css [:style "table,th {
+                                          border: 1px solid black;
+                                          border-collapse: collapse;
+                                          padding: 3px;
+                                          text-align: center
+                                         }
+                             td {
+                                          border: 1px solid black;
                                           border-collapse: collapse;
                                           padding: 3px;
                                           text-align: left
-                     }
-                     "])
+                                         }
+                                         "])
 
 (defn map-html-table-td [cl]
   (if (some? cl)
@@ -83,10 +90,13 @@
                                    [:div {:id "reports"}          
                                     [:h4 "Reports"]
                                     [:table
-                                     [:tr [:th "Philosophy Degrees Completed by Award Level"][:td [:a {:href "/philosophy/reports?rpt=awlevel_count"} "HTML"]]]                                    
-                                     [:tr [:th "Philosophy Degrees Completed by Institution"][:td [:a {:href "/philosophy/reports?rpt=inst_count"} "HTML"]]]
-                                     [:tr [:th "Philosophy Degrees Completed by State"][:td [:a {:href "/philosophy/reports?rpt=state_count"} "HTML"]]]
-                                     [:tr [:th "Philosophy Degrees Completed by Subject Classification"][:td [:a {:href "/philosophy/reports?rpt=cip_count"} "HTML"]]]]])))
+                                     [:thead
+                                      [:tr [:th {:scope "col"} "Report"][:th {:scope "col"} "Format"]]]
+                                     [:tbody
+                                      [:tr [:td "Philosophy Degrees Completed by Award Level"][:td [:a {:href "/philosophy/reports?rpt=awlevel_count"} "HTML"]]]                                    
+                                      [:tr [:td "Philosophy Degrees Completed by Institution"][:td [:a {:href "/philosophy/reports?rpt=inst_count"} "HTML"]]]
+                                      [:tr [:td "Philosophy Degrees Completed by State"][:td [:a {:href "/philosophy/reports?rpt=state_count"} "HTML"]]]
+                                      [:tr [:td "Philosophy Degrees Completed by Subject Classification"][:td [:a {:href "/philosophy/reports?rpt=cip_count"} "HTML"]]]]]])))
                                      
                                         
 
