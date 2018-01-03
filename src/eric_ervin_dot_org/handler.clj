@@ -61,7 +61,7 @@
                                           [:thead 
                                            [:tr   [:th {:scope "col"} "Resource"] [:th {:scope "col"}"Description"][:th {:scope "col"} "Data Updated"]]]                                  
                                           [:tbody
-                                           [:tr   [:td [:a {:href "/destiny"} "Destiny"]][:td "Star Wars Destiny card game data"][:td "12/22/2017"]]
+                                           [:tr   [:td [:a {:href "/destiny"} "Destiny"]][:td "Star Wars Destiny card game data"][:td "01/02/2018"]]
                                            [:tr   [:td [:a {:href "/discogs"} "Discogs"][:td "Albums I've cataloged"][:td "12/16/2017"]]]
                                            [:tr   [:td [:a {:href "/philosophy"} "Philosophy"][:td "Philosophy degrees completed during the 2014-2015 academic year."][:td "12/23/2017"]]] ;]]])))
                                            [:tr   [:td [:a {:href "/powerball"} "Powerball"]][:td " A source for Powerball numbers to play"][:td "N/A"]]]]])))
