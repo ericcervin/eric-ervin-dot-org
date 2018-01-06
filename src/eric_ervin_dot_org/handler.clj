@@ -7,7 +7,8 @@
             [eric-ervin-dot-org.routes.powerball :refer [powerball-routes]]
             [eric-ervin-dot-org.routes.discogs   :refer [discogs-routes]]
             [eric-ervin-dot-org.routes.destiny   :refer [destiny-routes]]
-            [eric-ervin-dot-org.routes.philosophy-usa   :refer [philosophy-routes]]))
+            [eric-ervin-dot-org.routes.philosophy-usa   :refer [philosophy-routes]]
+            [eric-ervin-dot-org.routes.gematria   :refer [gematria-routes]]))
 
 (def html-style-css [:style "table,th {
                                           border: 1px solid black;
@@ -63,8 +64,11 @@
                                           [:tbody
                                            [:tr   [:td [:a {:href "/destiny"} "Destiny"]][:td "Star Wars Destiny card game data"][:td "01/02/2018"]]
                                            [:tr   [:td [:a {:href "/discogs"} "Discogs"][:td "Albums I've cataloged"][:td "12/16/2017"]]]
-                                           [:tr   [:td [:a {:href "/philosophy"} "Philosophy"][:td "Philosophy degrees completed during the 2014-2015 academic year."][:td "12/23/2017"]]] ;]]])))
+                                           [:tr   [:td [:a {:href "/gematria"} "Gematria"]][:td "The numerical value of words"][:td "N/A"]]
+                                           [:tr   [:td [:a {:href "/philosophy"} "Philosophy"][:td "Philosophy degrees completed during the 2014-2015 academic year"][:td "12/23/2017"]]] ;]]])))
                                            [:tr   [:td [:a {:href "/powerball"} "Powerball"]][:td " A source for Powerball numbers to play"][:td "N/A"]]]]])))
+                                           
+                                           
                                     
                                          
 (defresource serialism [ctx]
@@ -90,6 +94,8 @@
   destiny-routes
   
   discogs-routes
+  
+  gematria-routes
   
   philosophy-routes)
 
