@@ -79,14 +79,16 @@
                                     [:div {:id "reports"}
                                      [:h4 "Reports"]
                                      [:table
-                                      [:tr [:td "Character Type Cards"][:td [:a {:href "/destiny/reports?rpt=character"} "HTML"]]]
+                                      
                                       [:tr [:td "Compatible with Villains, Command"][:td [:a {:href "/destiny/reports?rpt=villain_command_compatible"} "HTML"]]]
                                       [:tr [:td "Compatible with Legacy Villains, Command & Rogue"][:td [:a {:href "/destiny/reports?rpt=legacy_red_yellow_villains"} "HTML"]]]
                                       [:tr [:td "Count by Affiliation/Faction"][:td [:a {:href "/destiny/reports?rpt=affiliation_faction_count"} "HTML"]]]
                                       [:tr [:td "Count by Rarity"][:td [:a {:href "/destiny/reports?rpt=rarity_count"} "HTML"]]]
                                       [:tr [:td "Count by Set"][:td [:a {:href "/destiny/reports?rpt=set_count"} "HTML"]]]
                                       [:tr [:td "Highest Cost Support/Event/Upgrade"][:td [:a {:href "/destiny/reports?rpt=high_cost"} "HTML"]]]
-                                      [:tr [:td "Legendary Rarity Cards"][:td [:a {:href "/destiny/reports?rpt=legendary"} "HTML"]]]]])))
+                                      [:tr [:td "Legendary Rarity Cards"][:td [:a {:href "/destiny/reports?rpt=legendary"} "HTML"]]]
+                                      [:tr [:td "Type Character Cards"][:td [:a {:href "/destiny/reports?rpt=type_character"} "HTML"]]]
+                                      [:tr [:td "Type Upgrade Cards"][:td [:a {:href "/destiny/reports?rpt=type_upgrade"} "HTML"]]]]])))
 
 (defn cards-query [ctx] 
   (let [affil (get-in ctx [:request :params "affil"])
@@ -128,10 +130,16 @@
                                         from card where (affiliation = \"Villain\" or affiliation = \"Neutral\" ) 
                                                     and (faction = \"Command\" or faction = \"General\") 
                                         "}
-                               "character"
+                               "type_character"
                                {:header ["Set" "Position" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "MinPoints" "MaxPoints" "Health" "Image"] 
                                 :query "Select cardset, position, name, typename, affiliation, faction, isunique, rarity, cminpoints, cmaxpoints, chealth, imgsrc 
                                         from card where typename = \"Character\" 
+                                "}
+                                
+                               "type_upgrade"
+                               {:header ["Set" "Position" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "MinPoints" "MaxPoints" "Health" "Image"] 
+                                :query "Select cardset, position, name, typename, affiliation, faction, isunique, rarity, cminpoints, cmaxpoints, chealth, imgsrc 
+                                        from card where typename = \"Upgrade\" 
                                 "}
                                "legacy_red_yellow_villains"
                                {:header ["Set" "Position" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "MinPoints" "MaxPoints" "Health" "Image" "Text"] 
