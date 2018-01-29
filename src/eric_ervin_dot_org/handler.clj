@@ -4,11 +4,13 @@
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [hiccup.core :refer [html]]
             [clojure.java.jdbc :as sql]
-            [eric-ervin-dot-org.routes.powerball :refer [powerball-routes]]
             [eric-ervin-dot-org.routes.discogs   :refer [discogs-routes]]
             [eric-ervin-dot-org.routes.destiny   :refer [destiny-routes]]
+            [eric-ervin-dot-org.routes.gematria   :refer [gematria-routes]]
             [eric-ervin-dot-org.routes.philosophy-usa   :refer [philosophy-routes]]
-            [eric-ervin-dot-org.routes.gematria   :refer [gematria-routes]]))
+            [eric-ervin-dot-org.routes.powerball :refer [powerball-routes]]
+            [eric-ervin-dot-org.routes.serialism :refer [serialism-routes]]))
+            
 
 (def html-style-css [:style "table,th {
                                           border: 1px solid black;
@@ -25,14 +27,6 @@
                                          "])
             
                      
-(defn serialism_rows [_] (let [P0 (vec (shuffle (range 12)))
-                               R0 (vec (reverse P0))
-                               I0 (vec(map #(if (= % 0) 0 (- 12 %)) P0))
-                               RI0 (vec(reverse I0))]
-                           {:P0 P0
-                            :R0 R0
-                            :I0 I0
-                            :RI0 RI0}))
 
 (defresource echo_context [ctx]
                            
@@ -71,14 +65,6 @@
                                            
                                     
                                          
-(defresource serialism [ctx]
-             :allowed-methods [:get :options]
-             :available-media-types ["text/plain"]
-             :handle-ok serialism_rows)
-
-
-
-
 
 (defroutes app-routes
   (ANY "/" [] root)
@@ -87,17 +73,17 @@
   
   (ANY "/echo_request" [] echo_request)
   
-  powerball-routes
-  
-  (ANY "/serialism" [] serialism)
-  
   destiny-routes
   
   discogs-routes
   
   gematria-routes
   
-  philosophy-routes)
-
+  philosophy-routes
+  
+  powerball-routes
+  
+  serialism-routes)
+  
 (def app
   (wrap-params app-routes))
