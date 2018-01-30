@@ -12,21 +12,14 @@
             [eric-ervin-dot-org.routes.serialism :refer [serialism-routes]]))
             
 
-(def html-style-css [:style "table,th {
+(def html-style-css [:style "table,th,td {
                                           border: 1px solid black;
                                           border-collapse: collapse;
                                           padding: 3px;
                                           text-align: center
                                          }
-                             td {
-                                          border: 1px solid black;
-                                          border-collapse: collapse;
-                                          padding: 3px;
-                                          text-align: left
-                                         }
-                                         "])
-            
-                     
+                             td {text-align: left}"])
+
 
 (defresource echo_context [ctx]
                            
