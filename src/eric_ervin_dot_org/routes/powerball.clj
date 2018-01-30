@@ -2,15 +2,8 @@
   (:require [liberator.core :refer [resource defresource]]
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
-            [hiccup.core :refer [html]]))
-
-(def html-style-css [:style "table,th,td {
-                                          border: 1px solid black;
-                                          border-collapse: collapse;
-                                          padding: 3px;
-                                          text-align: center
-                                         }
-                             td {text-align: left}"])
+            [hiccup.core :refer [html]]
+            [eric-ervin-dot-org.representation :refer [html-style-css]]))
 
 
 (defn powerball-row-map []
@@ -23,12 +16,12 @@
 (defn powerball-row-html []
   (let [pbrm (powerball-row-map)] 
     (html [:tr 
-           [:td (str (:ball-1 pbrm))]
-           [:td (str (:ball-2 pbrm))]
-           [:td (str (:ball-3 pbrm))]
-           [:td (str (:ball-4 pbrm))]
-           [:td (str (:ball-5 pbrm))]
-           [:td (str (:pb pbrm))]])))
+           [:td (format "%02d"  (:ball-1 pbrm))] 
+           [:td (format "%02d"  (:ball-2 pbrm))]
+           [:td (format "%02d"  (:ball-3 pbrm))]
+           [:td (format "%02d"  (:ball-4 pbrm))]
+           [:td (format "%02d"  (:ball-5 pbrm))]
+           [:td (format "%02d"  (:pb pbrm))]])))
           
 
 (defn powerball-html [_]  

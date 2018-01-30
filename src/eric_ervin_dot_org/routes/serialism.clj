@@ -3,17 +3,8 @@
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [hiccup.core :refer [html]]
-            [clojure.java.jdbc :as sql]))
-
-
-(def html-style-css [:style "table,th,td {
-                                          border: 1px solid black;
-                                          border-collapse: collapse;
-                                          padding: 3px;
-                                          text-align: center
-                                         }
-                             "])
-
+            [clojure.java.jdbc :as sql]
+            [eric-ervin-dot-org.representation :refer [html-style-css]]))
 
 (defn map-html-table-td [cl]
   (if (some? cl)
@@ -22,10 +13,10 @@
 
 (defn serialism-html [mp]
   (html html-style-css [:table
-                        [:tr [:th "P0"](map map-html-table-td (:P0 mp))]
-                        [:tr [:th "R0"](map map-html-table-td (:R0 mp))]
-                        [:tr [:th "I0"](map map-html-table-td (:I0 mp))]
-                        [:tr [:th "RI0"](map map-html-table-td (:RI0 mp))]]))
+                        [:tr [:th "P0"](map map-html-table-td (map #(format "%02d" %) (:P0 mp)))]
+                        [:tr [:th "R0"](map map-html-table-td (map #(format "%02d" %) (:R0 mp)))]
+                        [:tr [:th "I0"](map map-html-table-td (map #(format "%02d" %) (:I0 mp)))]
+                        [:tr [:th "RI0"](map map-html-table-td (map #(format "%02d" %) (:RI0 mp)))]]))
 
 (defn serialism-map [] (let [P0 (vec (shuffle (range 12)))
                              R0 (vec (reverse P0))

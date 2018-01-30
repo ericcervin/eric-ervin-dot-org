@@ -3,15 +3,9 @@
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [hiccup.core :refer [html]]
-            [clojure.java.jdbc :as sql]))
+            [clojure.java.jdbc :as sql]
+            [eric-ervin-dot-org.representation :refer [html-style-css]]))
             
-(def html-style-css [:style "table,th,td {
-                                          border: 1px solid black;
-                                          border-collapse: collapse;
-                                          padding: 3px;
-                                          text-align: center
-                                         }
-                             td {text-align: left}"])
 
 (defn map-html-table-td [cl]
   (if (some? cl)
@@ -70,7 +64,7 @@
                                       [:tbody
                                        [:tr [:td "Count by Artist"][:td [:a {:href "/discogs/reports?rpt=artist_count"} "HTML"]]]
                                        [:tr [:td "Count by Label"][:td [:a {:href "/discogs/reports?rpt=label_count"} "HTML"]]]
-                                       [:tr [:td "Count by Year/Month Cataloged"][:td [:a {:href "/discogs/reports?rpt=year_month_added"} "HTML"]]]
+                                       ;;[:tr [:td "Count by Year/Month Cataloged"][:td [:a {:href "/discogs/reports?rpt=year_month_added"} "HTML"]]]
                                        [:tr [:td "Count by Year Released"][:td [:a {:href "/discogs/reports?rpt=year_count"} "HTML"]]]]]])))
 
 (defn report-query [ctx] 
