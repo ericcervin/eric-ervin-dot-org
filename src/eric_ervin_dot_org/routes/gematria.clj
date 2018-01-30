@@ -5,14 +5,13 @@
             [hiccup.core :refer [html]]
             [clojure.java.jdbc :as sql]))
 
-(def html-style-css [:style "table,th, td {
+(def html-style-css [:style "table,th,td {
                                           border: 1px solid black;
                                           border-collapse: collapse;
                                           padding: 3px;
-                                          text-align: center;
+                                          text-align: center
                                          }
-                             td {text-align: left;}
-                     "])
+                             td {text-align: left}"])
 
 (defn map-html-table-td [cl]
   (if (some? cl)
@@ -87,8 +86,7 @@
                                            [:input {:type "text" :name "value"}]
                                            [:input {:type "submit" :value "Search"}]]]))) 
                                           
-(defroutes gematria-routes
-  
+(defroutes gematria-routes  
   (ANY "/gematria" [] res-gematria)
   (ANY "/gematria/word" [] res-word)
   (ANY "/gematria/value" [] res-value))

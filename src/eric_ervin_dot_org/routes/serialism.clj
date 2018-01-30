@@ -6,19 +6,13 @@
             [clojure.java.jdbc :as sql]))
 
 
-(def html-style-css [:style "table,th {
+(def html-style-css [:style "table,th,td {
                                           border: 1px solid black;
                                           border-collapse: collapse;
                                           padding: 3px;
                                           text-align: center
                                          }
-                             td {
-                                          border: 1px solid black;
-                                          border-collapse: collapse;
-                                          padding: 3px;
-                                          text-align: center
-                                         }
-                                         "])
+                             "])
 
 
 (defn map-html-table-td [cl]
