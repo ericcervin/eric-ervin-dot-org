@@ -12,4 +12,11 @@
                                text-align: center
                                }
                              td {text-align: left}"])
+
+(defn map-html-table-td [cl]
+  (if (some? cl)
+      (if (clojure.string/includes? cl "http") (html [:td [:a {:href cl} cl]]) (html [:td cl]))
+      (html [:td])))    
+
+(defn map-html-table-tr [mp]  (html [:tr (map map-html-table-td mp)]))
             
