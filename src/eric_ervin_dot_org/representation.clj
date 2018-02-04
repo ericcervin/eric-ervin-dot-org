@@ -3,6 +3,7 @@
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [hiccup.core :refer [html]]
+            [hiccup.page :refer [doctype html5]]
             [clojure.java.jdbc :as sql]))
 
 (def html-style-css [:style "table,th,td {
@@ -16,7 +17,7 @@
 (defn map-html-table-td [cl]
   (if (some? cl)
       (if (clojure.string/includes? cl "http") (html [:td [:a {:href cl} cl]]) (html [:td cl]))
-      (html [:td])))    
+      (html [:td ""])))    
 
 (defn map-html-table-tr [mp]  (html [:tr (map map-html-table-td mp)]))
             
