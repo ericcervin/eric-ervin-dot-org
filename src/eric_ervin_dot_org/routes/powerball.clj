@@ -3,6 +3,7 @@
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [hiccup.core :refer [html]]
+            [hiccup.page :refer [doctype html5]]
             [eric-ervin-dot-org.representation :refer [html-style-css]]))
 
 
@@ -25,10 +26,13 @@
           
 
 (defn powerball-html [_]  
-  (html html-style-css        
-    [:table  [:tr [:th "1"][:th "2"][:th "3"][:th "4"][:th "5"][:th "pb"]]
-             (powerball-row-html)
-             (powerball-row-html)]))
+  (html5  {:lang "en"}
+          [:head html-style-css] 
+           
+          [:body        
+           [:table  [:tr [:th "1"][:th "2"][:th "3"][:th "4"][:th "5"][:th "pb"]]
+            (powerball-row-html)
+            (powerball-row-html)]]))
 
 (defn powerball-json [_]  
      {:set-1 (powerball-row-map)
@@ -45,18 +49,21 @@
 (defresource res-powerball [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (fn [ctx] (html html-style-css
-                                        [:div {:id "header"}
-                                         [:h3 "Powerball"]
-                                         [:p "Two sets of Powerball numbers"]]
-                                        [:div {:id "numbers"}
-                                         [:table
-                                          [:thead
-                                           [:th {:scope "col"} "Numbers"]]
-                                          [:tbody
-                                           [:tr [:td [:a {:href "/powerball/html"} "HTML"]]]
-                                           [:tr [:td [:a {:href "/powerball/json"} "JSON"]]]
-                                           [:tr [:td [:a {:href "/powerball/text"} "TEXT"]]]]]])))
+             :handle-ok (fn [ctx] (html5  {:lang "en"}
+                                    [:head html-style-css] 
+
+                                    [:body
+                                     [:div {:id "header"}
+                                      [:h3 "Powerball"]
+                                      [:p "Two sets of Powerball numbers"]]
+                                     [:div {:id "numbers"}
+                                      [:table
+                                       [:thead
+                                        [:tr [:th {:scope "col"} "Numbers"]]]
+                                       [:tbody
+                                        [:tr [:td [:a {:href "/powerball/html"} "HTML"]]]
+                                        [:tr [:td [:a {:href "/powerball/json"} "JSON"]]]
+                                        [:tr [:td [:a {:href "/powerball/text"} "TEXT"]]]]]]])))
 
 (defresource res-powerball-html [ctx]
              :allowed-methods [:get :options]

@@ -3,17 +3,10 @@
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [hiccup.core :refer [html]]
+            [hiccup.page :refer [doctype html5]]
             [clojure.java.jdbc :as sql]
-            [eric-ervin-dot-org.representation :refer [html-style-css]]))
+            [eric-ervin-dot-org.representation :refer [html-style-css map-html-table-td map-html-table-tr]]))
 
-
-(defn map-html-table-td [cl]
-  (if (some? cl)
-      (html [:td cl])
-      (html [:td])))    
-
-(defn map-html-table-tr [mp]
-  (html [:tr (map map-html-table-td mp)]))
 
 (defn calculate-word-value [wrd]
   (let [word wrd
@@ -31,16 +24,20 @@
                                    header (:header qry-map)
                                    results (sql/query db-spec [qry] {:as-arrays? true})
                                    report-rows (map map-html-table-tr (rest results))]
-                               (html html-style-css
-                                 [:table 
-                                  [:tr (map #(html [:th %]) header)]
-                                  report-rows])))
+                               (html5  {:lang "en"}
+                                 [:head html-style-css]
+                                 [:body
+                                  [:table 
+                                   [:tr (map #(html [:th %]) header)]
+                                   report-rows]])))
 
 (defn calculate-word-html [wrd]
   (let [wrd-map (calculate-word-value wrd)
         html-header [:tr (map #(html [:th %]) (conj (vec wrd) "total"))]
         html-result [:tr (map #(html [:td %]) (conj (:values wrd-map) (:totalvalue wrd-map)))]] 
-    (html html-style-css [:table html-header html-result])))
+    (html5  {:lang "en"}
+            [:head html-style-css] 
+            [:body [:table html-header html-result]])))
 
 (defresource res-value [ctx]
              :allowed-methods [:get :options]
@@ -63,7 +60,9 @@
 (defresource res-gematria [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (fn [ctx] (html html-style-css
+             :handle-ok (fn [ctx] (html5  {:lang "en"}
+                                       [:head html-style-css] 
+                                       [:body
                                         [:div {:id "header"}
                                          [:h2 "Gematria"]
                                          [:p "See also:"[:a {:href "https://en.wikipedia.org/wiki/Gematria"} "Wikipedia"]]]
@@ -78,7 +77,7 @@
                                           [:p "Search the 10,000 most common English words by numerical value."]
                                           [:form {:action "/gematria/value" :method "get"}
                                            [:input {:type "text" :name "value"}]
-                                           [:input {:type "submit" :value "Search"}]]]))) 
+                                           [:input {:type "submit" :value "Search"}]]]]))) 
                                           
 (defroutes gematria-routes  
   (ANY "/gematria" [] res-gematria)

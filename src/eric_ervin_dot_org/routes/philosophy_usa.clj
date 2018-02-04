@@ -3,27 +3,22 @@
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [hiccup.core :refer [html]]
+            [hiccup.page :refer [doctype html5]]
             [clojure.java.jdbc :as sql]
-            [eric-ervin-dot-org.representation :refer [html-style-css]]))
+            [eric-ervin-dot-org.representation :refer [html-style-css map-html-table-td map-html-table-tr]]))
 
-
-(defn map-html-table-td [cl]
-  (if (some? cl)
-      (if (clojure.string/includes? cl "http") (html [:td [:a {:href cl} cl]]) (html [:td cl]))
-      (html [:td])))    
-
-(defn map-html-table-tr [mp]
-  (html [:tr (map map-html-table-td mp)]))
 
 (defn reports-html [qry-map] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/philosophy-usa.db"}
                                    qry (:query qry-map)
                                    header (:header qry-map)
                                    results (sql/query db-spec [qry] {:as-arrays? true})
                                    report-rows (map map-html-table-tr (rest results))]
-                               (html html-style-css
-                                 [:table 
-                                  [:tr (map #(html [:th %]) header)]
-                                  report-rows])))
+                               (html5  {:lang "en"}
+                                       [:head html-style-css]
+                                       [:body
+                                        [:table 
+                                         [:tr (map #(html [:th %]) header)]
+                                         report-rows]])))
 
 
 
@@ -68,23 +63,26 @@
 (defresource res-philosophy [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (fn [ctx] (html html-style-css
-                                   [:div {:id "header"}
-                                    [:h3 "Philosopy USA"]
-                                    [:p "Philosophy and religious studies degrees completed during the 2014-2015 academic year."] 
-                                    [:p "Data taken from the Integrated Postsecondary Education Data System (IPEDS)"]
-                                    [:p [:a {:href "https://nces.ed.gov/ipeds/Home/UseTheData"} "https://nces.ed.gov/ipeds/Home/UseTheData"]]]
+             :handle-ok (fn [ctx] (html5  {:lang "en"}
+                                    [:head html-style-css] 
+
+                                    [:body
+                                     [:div {:id "header"}
+                                      [:h3 "Philosopy USA"]
+                                      [:p "Philosophy and religious studies degrees completed during the 2014-2015 academic year."] 
+                                      [:p "Data taken from the Integrated Postsecondary Education Data System (IPEDS)"]
+                                      [:p [:a {:href "https://nces.ed.gov/ipeds/Home/UseTheData"} "https://nces.ed.gov/ipeds/Home/UseTheData"]]]
                                    
-                                   [:div {:id "reports"}          
-                                    [:h4 "Reports"]
-                                    [:table
-                                     [:thead
-                                      [:tr [:th {:scope "col"} "Report"][:th {:scope "col"} "Format"]]]
-                                     [:tbody
-                                      [:tr [:td "Philosophy Degrees Completed by Award Level"][:td [:a {:href "/philosophy/reports?rpt=awlevel_count"} "HTML"]]]                                    
-                                      [:tr [:td "Philosophy Degrees Completed by Institution"][:td [:a {:href "/philosophy/reports?rpt=inst_count"} "HTML"]]]
-                                      [:tr [:td "Philosophy Degrees Completed by State"][:td [:a {:href "/philosophy/reports?rpt=state_count"} "HTML"]]]
-                                      [:tr [:td "Philosophy Degrees Completed by Subject Classification"][:td [:a {:href "/philosophy/reports?rpt=cip_count"} "HTML"]]]]]])))
+                                     [:div {:id "reports"}          
+                                      [:h4 "Reports"]
+                                      [:table
+                                       [:thead
+                                        [:tr [:th {:scope "col"} "Report"][:th {:scope "col"} "Format"]]]
+                                       [:tbody
+                                        [:tr [:td "Philosophy Degrees Completed by Award Level"][:td [:a {:href "/philosophy/reports?rpt=awlevel_count"} "HTML"]]]                                    
+                                        [:tr [:td "Philosophy Degrees Completed by Institution"][:td [:a {:href "/philosophy/reports?rpt=inst_count"} "HTML"]]]
+                                        [:tr [:td "Philosophy Degrees Completed by State"][:td [:a {:href "/philosophy/reports?rpt=state_count"} "HTML"]]]
+                                        [:tr [:td "Philosophy Degrees Completed by Subject Classification"][:td [:a {:href "/philosophy/reports?rpt=cip_count"} "HTML"]]]]]]])))
                                      
                                         
 

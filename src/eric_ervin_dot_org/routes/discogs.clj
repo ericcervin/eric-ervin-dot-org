@@ -3,27 +3,23 @@
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [hiccup.core :refer [html]]
+            [hiccup.page :refer [doctype html5]]
             [clojure.java.jdbc :as sql]
-            [eric-ervin-dot-org.representation :refer [html-style-css]]))
-            
+            [eric-ervin-dot-org.representation :refer [html-style-css map-html-table-td map-html-table-tr]]))
 
-(defn map-html-table-td [cl]
-  (if (some? cl)
-      (if (clojure.string/includes? cl "http") (html [:td [:a {:href cl} cl]]) (html [:td cl]))
-      (html [:td])))    
-
-(defn map-html-table-tr [mp]
-  (html [:tr (map map-html-table-td mp)]))
 
 (defn reports-html [qry-map] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/discogs.db"}
                                    qry (:query qry-map)
                                    header (:header qry-map)
                                    results (sql/query db-spec [qry] {:as-arrays? true})
                                    report-rows (map map-html-table-tr (rest results))]
-                               (html html-style-css
-                                 [:table 
-                                  [:tr (map #(html [:th %]) header)]
-                                  report-rows])))
+                               (html5  {:lang "en"}
+
+                                       [:head html-style-css] 
+                                       [:body
+                                        [:table 
+                                         [:tr (map #(html [:th %]) header)]
+                                         report-rows]])))
 
 (defn releases-query [ctx] 
   (let [sort (get-in ctx [:request :params "sort"])
@@ -39,33 +35,36 @@
 (defresource res-discogs [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (fn [ctx] (html html-style-css
-                                    [:div {:id "header"}
-                                     [:h3 "My Record Collection"]]
+             :handle-ok (fn [ctx] (html5  {:lang "en"}
+
+                                       [:head html-style-css] 
+                                       [:body
+                                        [:div {:id "header"}
+                                         [:h3 "My Record Collection"]]
                                     
-                                    [:div {:id "releases"}
-                                   
-                                     [:h4 "Releases"]
-                                     [:table
-                                      [:thead
-                                       [:tr [:th ""] [:th {:scope "col"} "By Title"][:th {:scope "col"} "By Artist"][:th {:scope "col"} "By Label"][:th {:scope "col"} "By Release Year"]]]
-                                      [:tbody
-                                       [:tr [:th "All"]     
-                                        [:td [:a {:href "/discogs/releases?sort=title"} "HTML"]]
-                                        [:td [:a {:href "/discogs/releases?sort=artist"} "HTML"]]
-                                        [:td [:a {:href "/discogs/releases?sort=label"} "HTML"]] 
-                                        [:td [:a {:href "/discogs/releases?sort=year"} "HTML"]]]]]]
+                                        [:div {:id "releases"}
+                                         
+                                         [:h4 "Releases"]
+                                         [:table
+                                          [:thead
+                                           [:tr [:th ""] [:th {:scope "col"} "By Title"][:th {:scope "col"} "By Artist"][:th {:scope "col"} "By Label"][:th {:scope "col"} "By Release Year"]]]
+                                          [:tbody
+                                           [:tr [:th "All"]     
+                                            [:td [:a {:href "/discogs/releases?sort=title"} "HTML"]]
+                                            [:td [:a {:href "/discogs/releases?sort=artist"} "HTML"]]
+                                            [:td [:a {:href "/discogs/releases?sort=label"} "HTML"]] 
+                                            [:td [:a {:href "/discogs/releases?sort=year"} "HTML"]]]]]]
                                     
-                                    [:div {:id "reports"}
-                                     [:h4 "Reports"]
-                                     [:table
-                                      [:thead
-                                       [:tr [:th {:scope "col"} "Report"][:th {:scope "col"} "Format"]]]
-                                      [:tbody
-                                       [:tr [:td "Count by Artist"][:td [:a {:href "/discogs/reports?rpt=artist_count"} "HTML"]]]
-                                       [:tr [:td "Count by Label"][:td [:a {:href "/discogs/reports?rpt=label_count"} "HTML"]]]
-                                       ;;[:tr [:td "Count by Year/Month Cataloged"][:td [:a {:href "/discogs/reports?rpt=year_month_added"} "HTML"]]]
-                                       [:tr [:td "Count by Year Released"][:td [:a {:href "/discogs/reports?rpt=year_count"} "HTML"]]]]]])))
+                                        [:div {:id "reports"}
+                                         [:h4 "Reports"]
+                                         [:table
+                                          [:thead
+                                           [:tr [:th {:scope "col"} "Report"][:th {:scope "col"} "Format"]]]
+                                          [:tbody
+                                           [:tr [:td "Count by Artist"][:td [:a {:href "/discogs/reports?rpt=artist_count"} "HTML"]]]
+                                           [:tr [:td "Count by Label"][:td [:a {:href "/discogs/reports?rpt=label_count"} "HTML"]]]
+                                           ;;[:tr [:td "Count by Year/Month Cataloged"][:td [:a {:href "/discogs/reports?rpt=year_month_added"} "HTML"]]]
+                                           [:tr [:td "Count by Year Released"][:td [:a {:href "/discogs/reports?rpt=year_count"} "HTML"]]]]]]])))
 
 (defn report-query [ctx] 
        (if-let [qry-map (condp = (get-in ctx [:request :params "rpt"])  

@@ -3,20 +3,20 @@
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [hiccup.core :refer [html]]
+            [hiccup.page :refer [doctype html5]]
             [clojure.java.jdbc :as sql]
-            [eric-ervin-dot-org.representation :refer [html-style-css]]))
-
-(defn map-html-table-td [cl]
-  (if (some? cl)
-      (html [:td cl])
-      (html [:td])))    
+            [eric-ervin-dot-org.representation :refer [html-style-css map-html-table-td map-html-table-tr]]))
+  
 
 (defn serialism-html [mp]
-  (html html-style-css [:table
-                        [:tr [:th "P0"](map map-html-table-td (map #(format "%02d" %) (:P0 mp)))]
-                        [:tr [:th "R0"](map map-html-table-td (map #(format "%02d" %) (:R0 mp)))]
-                        [:tr [:th "I0"](map map-html-table-td (map #(format "%02d" %) (:I0 mp)))]
-                        [:tr [:th "RI0"](map map-html-table-td (map #(format "%02d" %) (:RI0 mp)))]]))
+  (html5  {:lang "en"} 
+          [:head html-style-css] 
+           
+          [:body [:table
+                  [:tr [:th "P0"](map map-html-table-td (map #(format "%02d" %) (:P0 mp)))]
+                  [:tr [:th "R0"](map map-html-table-td (map #(format "%02d" %) (:R0 mp)))]
+                  [:tr [:th "I0"](map map-html-table-td (map #(format "%02d" %) (:I0 mp)))]
+                  [:tr [:th "RI0"](map map-html-table-td (map #(format "%02d" %) (:RI0 mp)))]]]))
 
 (defn serialism-map [] (let [P0 (vec (shuffle (range 12)))
                              R0 (vec (reverse P0))
