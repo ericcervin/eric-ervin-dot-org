@@ -19,17 +19,15 @@
       :value-pairs (vec value-pairs)
       :totalvalue total-value}))
 
-(defn reports-html [qry-map] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/gematria.db"}
-                                   qry (:query qry-map)
-                                   header (:header qry-map)
-                                   results (sql/query db-spec [qry] {:as-arrays? true})
-                                   report-rows (map map-html-table-tr (rest results))]
-                               (html5  {:lang "en"}
-                                 [:head html-style-css]
-                                 [:body
-                                  [:table 
-                                   [:tr (map #(html [:th %]) header)]
-                                   report-rows]])))
+(defn query-table [qry-map] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/gematria.db"}
+                                  qry (:query qry-map)
+                                  header (:header qry-map)
+                                  results (sql/query db-spec [qry] {:as-arrays? true})
+                                  report-rows (map map-html-table-tr (rest results))]
+                                 (html
+                                   [:table 
+                                    [:tr (map #(html [:th %]) header)]
+                                    report-rows])))
 
 (defn calculate-word-html [wrd]
   (let [wrd-map (calculate-word-value wrd)
@@ -37,17 +35,31 @@
         html-result [:tr (map #(html [:td %]) (conj (:values wrd-map) (:totalvalue wrd-map)))]] 
     (html5  {:lang "en"}
             [:head html-style-css] 
-            [:body [:table html-header html-result]])))
+            [:body [:div {:id "header"}
+                      [:table html-header html-result]]
+                   [:br][:br]
+                   [:div {:id "etc"}
+                    [:p "Others with same value"][:br]
+                    (query-table {:header ["Word" "Value"] 
+                                  :query (str "Select word, wordvalue 
+                                           from gematria 
+                                           where wordvalue = \"" (:totalvalue wrd-map) "\"
+                                           order by word")})]])))
+             
 
 (defresource res-value [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
              :handle-ok (fn [ctx] 
                           (let [val (get-in ctx [:request :params "value"])]
-                           (reports-html {:header ["Word" "Value"] 
-                                          :query (str "Select word, wordvalue 
-                                                       from gematria 
-                                                       where wordvalue = \"" val "\"")}))))
+                           (html5  {:lang "en"}
+                             [:head html-style-css]
+                             [:body
+                              (query-table {:header ["Word" "Value"] 
+                                            :query (str "Select word, wordvalue 
+                                                     from gematria 
+                                                     where wordvalue = \"" val "\"
+                                                     order by word")})]))))
                                         
 
 (defresource res-word [ctx]
