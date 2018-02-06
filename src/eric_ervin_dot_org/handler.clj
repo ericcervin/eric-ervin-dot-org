@@ -47,7 +47,8 @@
                                               [:tr   [:td [:a {:href "/discogs"} "Discogs"]][:td "Albums I've cataloged"][:td "12/16/2017"]]
                                               [:tr   [:td [:a {:href "/gematria"} "Gematria"]][:td "The numerical value of words"][:td "N/A"]]
                                               [:tr   [:td [:a {:href "/philosophy"} "Philosophy"]][:td "Philosophy degrees completed during the 2014-2015 academic year"][:td "12/23/2017"]] ;]]])))
-                                              [:tr   [:td [:a {:href "/powerball"} "Powerball"]][:td " A source for Powerball numbers to play"][:td "N/A"]]]]]])))
+                                              [:tr   [:td [:a {:href "/powerball"} "Powerball"]][:td "A source for Powerball numbers to play"][:td "N/A"]]
+                                              [:tr   [:td [:a {:href "/serialism"} "Serialism"]][:td "Toying with set theory and dodecaphony"][:td "N/A"]]]]]])))
                                            
 (defroutes app-routes
   (ANY "/" [] root)
