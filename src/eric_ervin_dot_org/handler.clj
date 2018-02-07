@@ -43,7 +43,7 @@
                                              [:thead 
                                               [:tr   [:th {:scope "col"} "Resource"] [:th {:scope "col"}"Description"][:th {:scope "col"} "Data Updated"]]]                                  
                                              [:tbody
-                                              [:tr   [:td [:a {:href "/destiny"} "Destiny"]][:td "Star Wars Destiny card game data"][:td "01/08/2018"]]
+                                              [:tr   [:td [:a {:href "/destiny"} "Destiny"]][:td "Star Wars Destiny card game data"][:td "02/07/2018"]]
                                               [:tr   [:td [:a {:href "/discogs"} "Discogs"]][:td "Albums I've cataloged"][:td "12/16/2017"]]
                                               [:tr   [:td [:a {:href "/gematria"} "Gematria"]][:td "The numerical value of words"][:td "N/A"]]
                                               [:tr   [:td [:a {:href "/philosophy"} "Philosophy"]][:td "Philosophy degrees completed during the 2014-2015 academic year"][:td "12/23/2017"]] ;]]])))
