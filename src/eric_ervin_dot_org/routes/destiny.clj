@@ -76,7 +76,8 @@
                                              [:tr [:td "Count by Rarity"][:td [:a {:href "/destiny/reports?rpt=rarity_count"} "HTML"]]]
                                              [:tr [:td "Count by Set"][:td [:a {:href "/destiny/reports?rpt=set_count"} "HTML"]]]
                                              [:tr [:td "Highest Cost Support/Event/Upgrade"][:td [:a {:href "/destiny/reports?rpt=high_cost"} "HTML"]]]
-                                             [:tr [:td "Legendary Rarity Cards"][:td [:a {:href "/destiny/reports?rpt=legendary"} "HTML"]]]
+                                             [:tr [:td "Rarity Legendary Cards"][:td [:a {:href "/destiny/reports?rpt=legendary"} "HTML"]]]
+                                             [:tr [:td "Rarity Rare Cards"][:td [:a {:href "/destiny/reports?rpt=rare"} "HTML"]]]
                                              [:tr [:td "Type Character Cards"][:td [:a {:href "/destiny/reports?rpt=type_character"} "HTML"]]]
                                              [:tr [:td "Type Upgrade Cards"][:td [:a {:href "/destiny/reports?rpt=type_upgrade"} "HTML"]]]]]])))
 
@@ -113,6 +114,11 @@
                                {:header ["Set" "Position" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost"] 
                                 :query "Select cardset, position, name, typename, affiliation, faction, isunique, rarity, ccost 
                                         from card where rarity = \"Legendary\" 
+                                        "}
+                               "rare" 
+                               {:header ["Set" "Position" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost"] 
+                                :query "Select cardset, position, name, typename, affiliation, faction, isunique, rarity, ccost 
+                                        from card where rarity = \"Rare\" 
                                         "}
                                "villain_command_compatible"
                                {:header ["Set" "Position" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost"] 
