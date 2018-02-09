@@ -71,7 +71,6 @@
                                             [:table
                                              
                                              [:tr [:td "Compatible with Villains, Command"][:td [:a {:href "/destiny/reports?rpt=villain_command_compatible"} "HTML"]]]
-                                             [:tr [:td "Compatible with Legacy Villains, Command & Rogue"][:td [:a {:href "/destiny/reports?rpt=legacy_red_yellow_villains"} "HTML"]]]
                                              [:tr [:td "Count by Affiliation/Faction"][:td [:a {:href "/destiny/reports?rpt=affiliation_faction_count"} "HTML"]]]
                                              [:tr [:td "Count by Rarity"][:td [:a {:href "/destiny/reports?rpt=rarity_count"} "HTML"]]]
                                              [:tr [:td "Count by Set"][:td [:a {:href "/destiny/reports?rpt=set_count"} "HTML"]]]
@@ -84,13 +83,13 @@
 (defn cards-query [ctx] 
   (let [affil (get-in ctx [:request :params "affil"])
         fact (get-in ctx [:request :params "fact"])
-        select-fields "cardset, position, name, typename, isunique, rarity, affiliation, faction, cminpoints, cmaxpoints, chealth, imgsrc"
+        select-fields "cardsetcode, position, name, typename, isunique, raritycode, affiliation, factioncode, cminpoints, cmaxpoints, chealth, csides,imgsrc"
         qry-str (cond (and (nil? affil) (nil? fact))  (str "Select " select-fields " from card")
                       (and (nil? affil) (some? fact)) (str "Select " select-fields " from card where faction = \"" fact "\"")
                       (and (some? affil) (nil? fact)) (str "Select " select-fields " from card where affiliation = \"" affil "\"")
                       :else (str "Select " select-fields " from card where affiliation = \"" affil "\" and faction = \"" fact "\""))
-        qry-map {:header ["Set" "Position" "Name" "Type" "Is Unique" "Rarity" "Affiliation" "Faction" 
-                          "Min Cost" "Max Cost" "Health" "Img Source"]
+        qry-map {:header ["Set" "Pos" "Name" "Type" "Unique" "Rarity" "Affil" "Faction" 
+                          "Min<br>Cost" "Max<br>Cost" "Health" "Sides" "Img Source"]
                  :query qry-str}]       
        (reports-html qry-map)))
 
@@ -106,44 +105,38 @@
                               {:header ["Set" "Count"] 
                                :query "Select cardset, count(*) as count from card group by cardset"}
                               "high_cost" 
-                               {:header ["Set" "Position" "Name" "Type" "Is Unique" "Rarity" "Cost"] 
-                                :query "Select cardset, position, name, typename, isunique, rarity, ccost 
+                               {:header ["Set" "Pos" "Name" "Type" "Is<br>Unique" "Rarity" "Cost" "Sides" "Image"] 
+                                :query "Select cardsetcode, position, name, typename, isunique, raritycode, ccost, csides, imgsrc
                                         from card where ccost is not null 
                                         order by ccost desc"}
                                "legendary" 
-                               {:header ["Set" "Position" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost"] 
-                                :query "Select cardset, position, name, typename, affiliation, faction, isunique, rarity, ccost 
+                               {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is<br>Unique" "Rarity" "Cost" "Sides" "Image"] 
+                                :query "Select cardsetcode, position, name, typename, affiliation, factioncode, isunique, raritycode, ccost, csides, imgsrc 
                                         from card where rarity = \"Legendary\" 
                                         "}
                                "rare" 
-                               {:header ["Set" "Position" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost"] 
-                                :query "Select cardset, position, name, typename, affiliation, faction, isunique, rarity, ccost 
+                               {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is<br>Unique" "Rarity" "Cost" "Sides" "Image"] 
+                                :query "Select cardsetcode, position, name, typename, affiliation, factioncode, isunique, raritycode, ccost, csides, imgsrc 
                                         from card where rarity = \"Rare\" 
                                         "}
                                "villain_command_compatible"
-                               {:header ["Set" "Position" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost"] 
-                                :query "Select cardset, position, name, typename, affiliation, faction, isunique, rarity, ccost 
+                               {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is<br>Unique" "Rarity" "Cost" "Sides" "Image"] 
+                                :query "Select cardsetcode, position, name, typename, affiliation, factioncode, isunique, raritycode, ccost, csides, imgsrc 
                                         from card where (affiliation = \"Villain\" or affiliation = \"Neutral\" ) 
                                                     and (faction = \"Command\" or faction = \"General\") 
                                         "}
                                "type_character"
-                               {:header ["Set" "Position" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "MinPoints" "MaxPoints" "Health" "Image"] 
-                                :query "Select cardset, position, name, typename, affiliation, faction, isunique, rarity, cminpoints, cmaxpoints, chealth, imgsrc 
+                               {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is<br>Unique" "Rarity" "MinPoints" "MaxPoints" "Health", "Sides" "Image"] 
+                                :query "Select cardsetcode, position, name, typename, affiliation, factioncode, isunique, raritycode, cminpoints, cmaxpoints, chealth, csides, imgsrc 
                                         from card where typename = \"Character\" 
                                 "}
                                 
                                "type_upgrade"
-                               {:header ["Set" "Position" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "MinPoints" "MaxPoints" "Health" "Image"] 
-                                :query "Select cardset, position, name, typename, affiliation, faction, isunique, rarity, cminpoints, cmaxpoints, chealth, imgsrc 
+                               {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is<br>Unique" "Rarity" "Cost" "Sides" "Image"] 
+                                :query "Select cardsetcode, position, name, typename, affiliation, faction, isunique, raritycode, ccost, csides, imgsrc 
                                         from card where typename = \"Upgrade\" 
-                                "}
-                               "legacy_red_yellow_villains"
-                               {:header ["Set" "Position" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "MinPoints" "MaxPoints" "Health" "Image" "Text"] 
-                                :query "Select cardset, position, name, typename, affiliation, faction, isunique, rarity, cminpoints, cmaxpoints, chealth, imgsrc, text 
-                                        from card where (affiliation = \"Villain\" or affiliation = \"Neutral\" ) 
-                                                    and (faction = \"Command\" or faction = \"General\" or faction = \"Rogue\")
-                                                    and cardset = \"Legacies\"
                                 "})]
+                               
                           
                           
                                         
