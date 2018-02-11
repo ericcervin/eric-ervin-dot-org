@@ -2,18 +2,14 @@
   (:require [liberator.core :refer [resource defresource]]
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
-            ;;[hiccup.core :refer [html]]
-            ;;[hiccup.page :refer [doctype html5]]
             [cljstache.core :refer [render]]
-            [clojure.java.jdbc :as sql]
-            ;;[eric-ervin-dot-org.representation :refer [html-style-css]]
             [eric-ervin-dot-org.routes.discogs   :refer [discogs-routes]]
             [eric-ervin-dot-org.routes.destiny   :refer [destiny-routes]]
             [eric-ervin-dot-org.routes.gematria   :refer [gematria-routes]]
             [eric-ervin-dot-org.routes.philosophy-usa   :refer [philosophy-routes]]
             [eric-ervin-dot-org.routes.powerball :refer [powerball-routes]]
-            [eric-ervin-dot-org.routes.serialism :refer [serialism-routes]]
-            [eric-ervin-dot-org.routes.test :refer [test-routes]]))
+            [eric-ervin-dot-org.routes.serialism :refer [serialism-routes]]))
+            
 
 
 
@@ -97,8 +93,7 @@
   powerball-routes
   
   serialism-routes
-  
-  test-routes)
+  )
   
 (def app
   (wrap-params app-routes))
