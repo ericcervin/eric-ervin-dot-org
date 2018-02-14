@@ -8,18 +8,18 @@
             [clojure.java.jdbc :as sql]
             [eric-ervin-dot-org.representation :refer [html-style-css map-html-table-td map-html-table-tr]]))
 
-(def report-list {:reports [
-                            {:text "Compatible with Villains, Command" :key "villain_command_compatible"}
-                            {:text "Count by Affiliation/Faction" :key "affiliation_faction_count"}
-                            {:text "Count by Rarity" :key "rarity_count"}
-                            {:text "Count by Set" :key "set_count"}
-                            {:text "Highest Cost Support/Event/Upgrade" :key "high_cost"}
-                            {:text "Rarity Legendary Cards" :key "legendary"}
-                            {:text "Rarity Rare Cards" :key "rare"}
-                            {:text "Type Character Cards" :key  "type_character"}
-                            {:text "Type Upgrade Cards" :key "type_upgrade"}]})
+(def destiny-root-map {:reports [
+                                 {:text "Compatible with Villains, Command" :key "villain_command_compatible"}
+                                 {:text "Count by Affiliation/Faction" :key "affiliation_faction_count"}
+                                 {:text "Count by Rarity" :key "rarity_count"}
+                                 {:text "Count by Set" :key "set_count"}
+                                 {:text "Highest Cost Support/Event/Upgrade" :key "high_cost"}
+                                 {:text "Rarity Legendary Cards" :key "legendary"}
+                                 {:text "Rarity Rare Cards" :key "rare"}
+                                 {:text "Type Character Cards" :key  "type_character"}
+                                 {:text "Type Upgrade Cards" :key "type_upgrade"}]
+                         :factions ["Command" "Force" "Rogue" "General"]})
                             
-
 
 
 
@@ -38,7 +38,7 @@
 
 
 
-(def destiny-string "
+(def destiny-root-template "
   <!DOCTYPE html>
   <html lang=\"en\">
   <head>
@@ -66,10 +66,16 @@
   <tr><th></th><th></th><th scope=\"col\">All</th><th scope=\"col\">Villain</th><th scope=\"col\">Hero</th><th scope=\"col\">Neutral</th></tr></thead>
   <tbody>
   <tr><th rowspan=\"5\">Faction</th><th scope=\"row\">All</th><td><a href=\"/destiny/cards?\">HTML</a></td><td><a href=\"/destiny/cards?affil=Villain\">HTML</a></td><td><a href=\"/destiny/cards?affil=Hero\">HTML</a></td><td><a href=\"/destiny/cards?affil=Neutral\">HTML</a></td></tr>
-  <tr><th scope=\"row\">Command</th><td><a href=\"/destiny/cards?fact=Command\">HTML</a></td><td><a href=\"/destiny/cards?affil=Villain&amp;fact=Command\">HTML</a></td><td><a href=\"/destiny/cards?affil=Hero&amp;fact=Command\">HTML</a></td><td><a href=\"/destiny/cards?affil=Neutral&amp;fact=Command\">HTML</a></td></tr>
-  <tr><th scope=\"row\">Force</th><td><a href=\"/destiny/cards?fact=Force\">HTML</a></td><td><a href=\"/destiny/cards?affil=Villain&amp;fact=Force\">HTML</a></td><td><a href=\"/destiny/cards?affil=Hero&amp;fact=Force\">HTML</a></td><td><a href=\"/destiny/cards?affil=Neutral&amp;fact=Force\">HTML</a></td></tr>
-  <tr><th scope=\"row\">Rogue</th><td><a href=\"/destiny/cards?fact=Rogue\">HTML</a></td><td><a href=\"/destiny/cards?affil=Villain&amp;fact=Rogue\">HTML</a></td><td><a href=\"/destiny/cards?affil=Hero&amp;fact=Rogue\">HTML</a></td><td><a href=\"/destiny/cards?affil=Neutral&amp;fact=Rogue\">HTML</a></td></tr>
-  <tr><th scope=\"row\">General</th><td><a href=\"/destiny/cards?fact=General\">HTML</a></td><td><a href=\"/destiny/cards?affil=Villain&amp;fact=General\">HTML</a></td><td><a href=\"/destiny/cards?affil=Hero&amp;fact=General\">HTML</a></td><td><a href=\"/destiny/cards?affil=Neutral&amp;fact=General\">HTML</a></td></tr>
+  {{#factions}}
+  <tr>
+
+  <th scope=\"row\">{{.}}</th>
+  <td><a href=\"/destiny/cards?fact={{.}}\">HTML</a></td>
+  <td><a href=\"/destiny/cards?affil=Villain&amp;fact={{.}}\">HTML</a></td>
+  <td><a href=\"/destiny/cards?affil=Hero&amp;fact={{.}}\">HTML</a></td>
+  <td><a href=\"/destiny/cards?affil=Neutral&amp;fact={{.}}\">HTML</a></td>
+  </tr>
+  {{/factions}}
   </tbody>
   </table>
   </div>
@@ -89,7 +95,7 @@
 (defresource res-destiny [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (render destiny-string report-list))
+             :handle-ok (render destiny-root-template destiny-root-map))
 
 (defn cards-query [ctx] 
   (let [affil (get-in ctx [:request :params "affil"])
