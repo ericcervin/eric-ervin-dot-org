@@ -3,8 +3,6 @@
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [cljstache.core :refer [render]]
-            [hiccup.core :refer [html]]
-            [hiccup.page :refer [doctype html5]]
             [clojure.java.jdbc :as sql]
             [eric-ervin-dot-org.representation :refer [html-style-css map-html-table-td map-html-table-tr]]))
 
@@ -20,22 +18,6 @@
                                  {:text "Type Upgrade Cards" :key "type_upgrade"}]
                          :factions ["Command" "Force" "Rogue" "General"]})
                             
-
-
-
-(defn reports-html [qry-map] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/destiny.db"}
-                                   qry (:query qry-map)
-                                   header (:header qry-map)
-                                   results (sql/query db-spec [qry] {:as-arrays? true})
-                                   report-rows (map map-html-table-tr (rest results))]
-                               (html5  {:lang "en"}
-                                       [:head html-style-css] 
-                                        
-                                       [:body
-                                        [:table 
-                                         [:tr (map #(html [:th %]) header)]
-                                         report-rows]])))
-
 
 
 (def destiny-root-template "
@@ -92,6 +74,53 @@
   ")
 
 
+(def destiny-report-template "
+  <!DOCTYPE html>
+  <html lang=\"en\">
+  <head>
+  <title>Destiny</title>
+  <style>
+  table,th,td {
+                               border: 1px solid black;
+                               border-collapse: collapse;
+                               font-size: small;
+                               padding: 3px;
+                               text-align: center
+                               }
+       td {text-align: left}
+  </style>
+  </head>
+  <body>
+  <div id=\"report\">
+  <table>
+  <thead>
+  <tr>{{#header}}<th>{{{.}}}</th>{{/header}}</tr>
+  </thead>
+  <tbody>
+  {{#results}}
+  <tr>{{#result}}<td>{{vl}}</td>{{/result}}</tr>
+  {{/results}}
+  </table>
+  </div>
+  </body>
+  </html>
+  ")
+
+
+(defn vector-of-maps [x] (vec (map #(hash-map :vl %) x)))
+
+(defn reports-html [qry-map] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/destiny.db"}
+                                   qry (:query qry-map)
+                                   header (:header qry-map)
+                                   results (sql/query db-spec [qry] {:as-arrays? true})
+                                   output-map {:header header
+                                               :results (vec (map #(hash-map :result (vector-of-maps %)) (rest results)))}]
+                               ;;report-rows (map map-html-table-tr (rest results))]
+                               ;;(str header (rest results))))
+                               ;; (str output-map))) 
+                               (render destiny-report-template output-map)))
+
+
 (defresource res-destiny [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
@@ -122,42 +151,38 @@
                               {:header ["Set" "Count"] 
                                :query "Select cardset, count(*) as count from card group by cardset"}
                               "high_cost" 
-                               {:header ["Set" "Pos" "Name" "Type" "Is<br>Unique" "Rarity" "Cost" "Sides" "Image"] 
+                               {:header ["Set" "Pos" "Name" "Type" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
                                 :query "Select cardsetcode, position, name, typename, isunique, raritycode, ccost, csides, imgsrc
                                         from card where ccost is not null 
                                         order by ccost desc"}
                                "legendary" 
-                               {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is<br>Unique" "Rarity" "Cost" "Sides" "Image"] 
+                               {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
                                 :query "Select cardsetcode, position, name, typename, affiliation, factioncode, isunique, raritycode, ccost, csides, imgsrc 
                                         from card where rarity = \"Legendary\" 
                                         "}
                                "rare" 
-                               {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is<br>Unique" "Rarity" "Cost" "Sides" "Image"] 
+                               {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
                                 :query "Select cardsetcode, position, name, typename, affiliation, factioncode, isunique, raritycode, ccost, csides, imgsrc 
                                         from card where rarity = \"Rare\" 
                                         "}
                                "villain_command_compatible"
-                               {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is<br>Unique" "Rarity" "Cost" "Sides" "Image"] 
+                               {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
                                 :query "Select cardsetcode, position, name, typename, affiliation, factioncode, isunique, raritycode, ccost, csides, imgsrc 
                                         from card where (affiliation = \"Villain\" or affiliation = \"Neutral\" ) 
                                                     and (faction = \"Command\" or faction = \"General\") 
                                         "}
                                "type_character"
-                               {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is<br>Unique" "Rarity" "MinPoints" "MaxPoints" "Health", "Sides" "Image"] 
+                               {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "MinPoints" "MaxPoints" "Health", "Sides" "Image"] 
                                 :query "Select cardsetcode, position, name, typename, affiliation, factioncode, isunique, raritycode, cminpoints, cmaxpoints, chealth, csides, imgsrc 
                                         from card where typename = \"Character\" 
                                 "}
                                 
                                "type_upgrade"
-                               {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is<br>Unique" "Rarity" "Cost" "Sides" "Image"] 
+                               {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
                                 :query "Select cardsetcode, position, name, typename, affiliation, faction, isunique, raritycode, ccost, csides, imgsrc 
                                         from card where typename = \"Upgrade\" 
                                 "})]
-                               
-                          
-                          
-                                        
-                                   
+                                               
          (reports-html qry-map)))
 
 (defresource res-cards [ctx] :allowed-methods [:get :options] :available-media-types ["text/html"] :handle-ok cards-query)
