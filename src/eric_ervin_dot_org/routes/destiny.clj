@@ -3,8 +3,8 @@
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [cljstache.core :refer [render]]
-            [clojure.java.jdbc :as sql]
-            [eric-ervin-dot-org.representation :refer [html-style-css map-html-table-td map-html-table-tr]]))
+            [clojure.java.jdbc :as sql]))
+            ;;[eric-ervin-dot-org.representation :refer [html-style-css map-html-table-td map-html-table-tr]]))
 
 (def destiny-root-map {:reports [
                                  {:text "Compatible with Villains, Command" :key "villain_command_compatible"}
@@ -98,7 +98,7 @@
   </thead>
   <tbody>
   {{#results}}
-  <tr>{{#result}}<td>{{vl}}</td>{{/result}}</tr>
+  <tr>{{#result}}<td>{{{vl}}}</td>{{/result}}</tr>
   {{/results}}
   </table>
   </div>
@@ -109,15 +109,21 @@
 
 (defn vector-of-maps [x] (vec (map #(hash-map :vl %) x)))
 
+(defn html-for-http [cl] 
+  (if (some? cl)
+   (if (clojure.string/includes? cl "http") (str "<A HREF = \"" cl "\">" cl"</A>") cl)
+   cl))
+
+(defn html-for-result [res] (map html-for-http res))
+
 (defn reports-html [qry-map] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/destiny.db"}
                                    qry (:query qry-map)
                                    header (:header qry-map)
                                    results (sql/query db-spec [qry] {:as-arrays? true})
+                                   results (map html-for-result (rest results))
                                    output-map {:header header
-                                               :results (vec (map #(hash-map :result (vector-of-maps %)) (rest results)))}]
-                               ;;report-rows (map map-html-table-tr (rest results))]
-                               ;;(str header (rest results))))
-                               ;; (str output-map))) 
+                                               :results (vec (map #(hash-map :result (vector-of-maps %)) results))}]
+                               
                                (render destiny-report-template output-map)))
 
 
