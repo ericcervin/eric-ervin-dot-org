@@ -2,6 +2,7 @@
   (:require [liberator.core :refer [resource defresource]]
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
+            [cljstache.core :refer [render]]
             [hiccup.core :refer [html]]
             [hiccup.page :refer [doctype html5]]
             [clojure.java.jdbc :as sql]
@@ -21,6 +22,58 @@
                                          [:tr (map #(html [:th %]) header)]
                                          report-rows]])))
 
+
+(def discogs-root-template "
+     <!DOCTYPE html>
+     <html lang=\"en\">
+     <head>
+     <style> table,th,td {
+                      border: 1px solid black;
+                      border-collapse: collapse;
+                      padding: 3px;
+                      text-align: center;}
+                               
+              td {text-align: left}
+     </style>
+     </head>
+     <body>
+     <div id=\"header\"><h3>My Record Collection</h3>
+     </div>
+     <div id=\"releases\">
+     <h4>Releases</h4>
+     <table>
+     <thead>
+     <tr>
+     <th></th>
+     <th scope=\"col\">By Title</th>
+     <th scope=\"col\">By Artist</th>
+     <th scope=\"col\">By Label</th>
+     <th scope=\"col\">By Release Year</th></tr>
+     </thead>
+     <tbody>
+     <tr>
+     <th>All</th><td><a href=\"/discogs/releases?sort=title\">HTML</a></td>
+     <td><a href=\"/discogs/releases?sort=artist\">HTML</a></td>
+     <td><a href=\"/discogs/releases?sort=label\">HTML</a></td>
+     <td><a href=\"/discogs/releases?sort=year\">HTML</a></td></tr>
+     </tbody>
+     </table>
+     </div>
+     <div id=\"reports\"><h4>Reports</h4>
+     <table>
+     <thead><tr>
+     <th scope=\"col\">Report</th><th scope=\"col\">Format</th></tr></thead>
+     <tbody>
+     <tr><td>Count by Artist</td><td><a href=\"/discogs/reports?rpt=artist_count\">HTML</a></td></tr>
+     <tr><td>Count by Label</td><td><a href=\"/discogs/reports?rpt=label_count\">HTML</a></td></tr>
+     <tr><td>Count by Year Released</td><td><a href=\"/discogs/reports?rpt=year_count\">HTML</a></td></tr>
+     </tbody>
+     </table></div></body></html>")
+  
+  
+
+
+
 (defn releases-query [ctx] 
   (let [sort (get-in ctx [:request :params "sort"])
         select-fields "title, artist, label, year"
@@ -32,39 +85,11 @@
 
 
 
+
 (defresource res-discogs [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (fn [ctx] (html5  {:lang "en"}
-
-                                       [:head html-style-css] 
-                                       [:body
-                                        [:div {:id "header"}
-                                         [:h3 "My Record Collection"]]
-                                    
-                                        [:div {:id "releases"}
-                                         
-                                         [:h4 "Releases"]
-                                         [:table
-                                          [:thead
-                                           [:tr [:th ""] [:th {:scope "col"} "By Title"][:th {:scope "col"} "By Artist"][:th {:scope "col"} "By Label"][:th {:scope "col"} "By Release Year"]]]
-                                          [:tbody
-                                           [:tr [:th "All"]     
-                                            [:td [:a {:href "/discogs/releases?sort=title"} "HTML"]]
-                                            [:td [:a {:href "/discogs/releases?sort=artist"} "HTML"]]
-                                            [:td [:a {:href "/discogs/releases?sort=label"} "HTML"]] 
-                                            [:td [:a {:href "/discogs/releases?sort=year"} "HTML"]]]]]]
-                                    
-                                        [:div {:id "reports"}
-                                         [:h4 "Reports"]
-                                         [:table
-                                          [:thead
-                                           [:tr [:th {:scope "col"} "Report"][:th {:scope "col"} "Format"]]]
-                                          [:tbody
-                                           [:tr [:td "Count by Artist"][:td [:a {:href "/discogs/reports?rpt=artist_count"} "HTML"]]]
-                                           [:tr [:td "Count by Label"][:td [:a {:href "/discogs/reports?rpt=label_count"} "HTML"]]]
-                                           ;;[:tr [:td "Count by Year/Month Cataloged"][:td [:a {:href "/discogs/reports?rpt=year_month_added"} "HTML"]]]
-                                           [:tr [:td "Count by Year Released"][:td [:a {:href "/discogs/reports?rpt=year_count"} "HTML"]]]]]]])))
+             :handle-ok (render discogs-root-template))
 
 (defn report-query [ctx] 
        (if-let [qry-map (condp = (get-in ctx [:request :params "rpt"])  

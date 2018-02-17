@@ -3,9 +3,8 @@
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [cljstache.core :refer [render]]
-            [clojure.java.jdbc :as sql]))
-            ;;[eric-ervin-dot-org.representation :refer [html-style-css map-html-table-td map-html-table-tr]]))
-
+            [clojure.java.jdbc :as sql]
+            ))
 (def destiny-root-map {:reports [
                                  {:text "Compatible with Villains, Command" :key "villain_command_compatible"}
                                  {:text "Count by Affiliation/Faction" :key "affiliation_faction_count"}
