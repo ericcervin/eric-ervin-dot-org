@@ -3,24 +3,45 @@
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [cljstache.core :refer [render]]
-            [hiccup.core :refer [html]]
-            [hiccup.page :refer [doctype html5]]
-            [clojure.java.jdbc :as sql]
-            [eric-ervin-dot-org.representation :refer [html-style-css map-html-table-td map-html-table-tr]]))
+            [clojure.java.jdbc :as sql]))
+            ;;[eric-ervin-dot-org.representation :refer [html-style-css map-html-table-td map-html-table-tr]]))
 
+
+
+(def discogs-report-template 
+     "<!DOCTYPE html>
+      <html lang=\"en\">
+      <head>
+      <style> table,th,td {
+                      border: 1px solid black;
+                      border-collapse: collapse;
+                      padding: 3px;
+                      text-align: center;}
+                               
+              td {text-align: left}
+      </style>
+      </head>
+      <body>
+      <table>
+      <thead><tr>{{#header}}<th>{{.}}</th>{{/header}}</tr></thead>
+      <tbody>
+      {{#results}}
+      <tr>{{#result}}<td>{{{vl}}}</td>{{/result}}</tr>
+      {{/results}}
+      </tbody>
+      </table>
+      </body>
+      </html>")
+
+(defn vector-of-maps [x] (vec (map #(hash-map :vl %) x)))
 
 (defn reports-html [qry-map] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/discogs.db"}
                                    qry (:query qry-map)
                                    header (:header qry-map)
                                    results (sql/query db-spec [qry] {:as-arrays? true})
-                                   report-rows (map map-html-table-tr (rest results))]
-                               (html5  {:lang "en"}
-
-                                       [:head html-style-css] 
-                                       [:body
-                                        [:table 
-                                         [:tr (map #(html [:th %]) header)]
-                                         report-rows]])))
+                                   output-map {:header header :results (vec (map #(hash-map :result (vector-of-maps %)) (rest results)))}]
+                               
+                               (render discogs-report-template output-map)))
 
 
 (def discogs-root-template "
@@ -70,9 +91,6 @@
      </tbody>
      </table></div></body></html>")
   
-  
-
-
 
 (defn releases-query [ctx] 
   (let [sort (get-in ctx [:request :params "sort"])
