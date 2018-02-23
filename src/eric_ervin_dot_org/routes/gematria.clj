@@ -4,9 +4,40 @@
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [hiccup.core :refer [html]]
             [hiccup.page :refer [doctype html5]]
+            [cljstache.core :refer [render]]
             [clojure.java.jdbc :as sql]
             [eric-ervin-dot-org.representation :refer [html-style-css map-html-table-td map-html-table-tr]]))
 
+
+(def gematria-root-template "<!DOCTYPE html>
+    <html lang=\"en\"><head><style>table,th,td {}
+                               border: 1px solid black;
+                               border-collapse: collapse;
+                               padding: 3px;
+                               text-align: center
+                               
+                             td {text-align: left}</style>
+    </head>
+    <body>
+    <div id=\"header\">
+    <h2>Gematria</h2>
+    <p>See also:<a href=\"https://en.wikipedia.org/wiki/Gematria\">Wikipedia</a></p>
+    </div>
+    <div id=\"word_form\">
+    <p>Calculate the numerical value of a word.</p>
+    <form action=\"/gematria/word\" method=\"get\">
+    <input name=\"word\" type=\"text\">
+    <input type=\"submit\" value=\"Calculate\"></form>
+    </div>
+    <div id=\"value_form\">
+    <p>Search the 10,000 most common English words by numerical value.</p>
+    <form action=\"/gematria/value\" method=\"get\">
+    <input name=\"value\" type=\"text\">
+    <input type=\"submit\" value=\"Search\">
+    </form>
+    </div>
+    </body>
+    </html>")
 
 (defn calculate-word-value [wrd]
   (let [word wrd
@@ -45,7 +76,6 @@
                                            from gematria 
                                            where wordvalue = \"" (:totalvalue wrd-map) "\"
                                            order by word")})]])))
-             
 
 (defresource res-value [ctx]
              :allowed-methods [:get :options]
@@ -72,24 +102,7 @@
 (defresource res-gematria [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (fn [ctx] (html5  {:lang "en"}
-                                       [:head html-style-css] 
-                                       [:body
-                                        [:div {:id "header"}
-                                         [:h2 "Gematria"]
-                                         [:p "See also:"[:a {:href "https://en.wikipedia.org/wiki/Gematria"} "Wikipedia"]]]
-                                         
-                                        [:div {:id "word_form"}
-                                          [:p "Calculate the numerical value of a word."]
-                                          [:form {:action "/gematria/word" :method "get"}
-                                           [:input {:type "text" :name "word"}]
-                                           [:input {:type "submit" :value "Calculate"}]]]
-                                    
-                                        [:div {:id "value_form"}
-                                          [:p "Search the 10,000 most common English words by numerical value."]
-                                          [:form {:action "/gematria/value" :method "get"}
-                                           [:input {:type "text" :name "value"}]
-                                           [:input {:type "submit" :value "Search"}]]]]))) 
+             :handle-ok (render gematria-root-template)) 
                                           
 (defroutes gematria-routes  
   (ANY "/gematria" [] res-gematria)
