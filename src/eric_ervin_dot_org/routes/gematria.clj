@@ -39,6 +39,38 @@
     </body>
     </html>")
 
+(def gematria-word-template 
+     "<!DOCTYPE html>
+      <html lang=\"en\">
+      <head>
+          <style>table,th,td {
+                 border: 1px solid black;
+                 border-collapse: collapse;
+                 padding: 3px;
+                 text-align: center
+          }
+                 td {text-align: left}
+      </style></head>
+      <body>
+      <div id=\"header\">
+      <table>
+      <tr>{{#wrd-vec}}<th>{{.}}</th>{{/wrd-vec}}</tr>
+      <tr>{{#wrd-result}}<td>{{.}}</td>{{/wrd-result}}</tr></table>
+  </div>
+  <br><br>
+  <div id=\"etc\">
+  <p>Others with same value</p>
+  <br>
+  <table>
+  <tr><th>Word</th><th>Value</th></tr>
+   {{#other-results}}
+   <tr>{{#result}}<td>{{.}}</td>{{/result}}</tr>
+   {{/other-results}}
+  </table>
+  </div>
+  </body>
+  </html>")
+
 (defn calculate-word-value [wrd]
   (let [word wrd
         lc-word (clojure.string/lower-case wrd)
@@ -60,22 +92,41 @@
                                     [:tr (map #(html [:th %]) header)]
                                     report-rows])))
 
+(defn query-table2 [query] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/gematria.db"}
+                                 qry query
+                                 results (sql/query db-spec [qry] {:as-arrays? true})
+                                 result-rows (map #(hash-map :result %) (rest results))]
+                             
+                             result-rows))
+
+;;(defn calculate-word-html [wrd]
+;;  (let [wrd-map (calculate-word-value wrd)
+;;        html-header [:tr (map #(html [:th %]) (conj (vec wrd) "total"))]
+;;  html-result [:tr (map #(html [:td %]) (conj (:values wrd-map) (:totalvalue wrd-map)))] 
+;;  (html5  {:lang "en"}
+;;  [:head html-style-css] 
+;;  [:body [:div {:id "header"}
+;;          [:table html-header html-result]
+;;  [:br][:br]
+;;  [:div {:id "etc"}
+;;   [:p "Others with same value"][:br]
+;;  (query-table {:header ["Word" "Value"] 
+;;                :query (str "Select word, wordvalue 
+;;                         from gematria 
+;;                         where wordvalue = \"" (:totalvalue wrd-map) "\"
+;;                         order by word"))
+
 (defn calculate-word-html [wrd]
   (let [wrd-map (calculate-word-value wrd)
-        html-header [:tr (map #(html [:th %]) (conj (vec wrd) "total"))]
-        html-result [:tr (map #(html [:td %]) (conj (:values wrd-map) (:totalvalue wrd-map)))]] 
-    (html5  {:lang "en"}
-            [:head html-style-css] 
-            [:body [:div {:id "header"}
-                      [:table html-header html-result]]
-                   [:br][:br]
-                   [:div {:id "etc"}
-                    [:p "Others with same value"][:br]
-                    (query-table {:header ["Word" "Value"] 
-                                  :query (str "Select word, wordvalue 
-                                           from gematria 
-                                           where wordvalue = \"" (:totalvalue wrd-map) "\"
-                                           order by word")})]])))
+        ;;word-header (map #(:th %) (conj (vec wrd) "total"))
+        word-result (conj (:values wrd-map) (:totalvalue wrd-map))
+        query (str "Select word, wordvalue from gematria where wordvalue = \"" (:totalvalue wrd-map) "\" order by word")
+        other-results (query-table2 query) 
+        output-map {:wrd-vec (conj (vec wrd) "total")
+                    :wrd-result word-result
+                    :other-results other-results}]
+    (render gematria-word-template output-map))) 
+    
 
 (defresource res-value [ctx]
              :allowed-methods [:get :options]
@@ -96,8 +147,8 @@
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
              :handle-ok (fn [ctx] 
-                          (let [wrd (get-in ctx [:request :params "word"])]
-                           (calculate-word-html wrd))))
+                           (let [wrd (get-in ctx [:request :params "word"])]
+                             (calculate-word-html wrd))))
 
 (defresource res-gematria [ctx]
              :allowed-methods [:get :options]
