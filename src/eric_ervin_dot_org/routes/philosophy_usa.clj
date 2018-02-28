@@ -4,8 +4,48 @@
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [hiccup.core :refer [html]]
             [hiccup.page :refer [doctype html5]]
+            [cljstache.core :refer [render]]
             [clojure.java.jdbc :as sql]
             [eric-ervin-dot-org.representation :refer [html-style-css map-html-table-td map-html-table-tr]]))
+
+
+(def philosophy-root-template 
+  "<!DOCTYPE html>
+<html lang=\"en\"><head><style>table,th,td {
+                               border: 1px solid black;
+                               border-collapse: collapse;
+                               padding: 3px;
+                               text-align: center
+                               }
+                             td {text-align: left}
+</style>
+</head>
+<body>
+<div id=\"header\">
+<h3>Philosopy USA</h3>
+<p>Philosophy and religious studies degrees completed during the 2014-2015 academic year.</p>
+<p>Data taken from the Integrated Postsecondary Education Data System (IPEDS)</p>
+<p><a href=\"https://nces.ed.gov/ipeds/Home/UseTheData\">https://nces.ed.gov/ipeds/Home/UseTheData</a></p>
+</div>
+<div id=\"reports\">
+<h4>Reports</h4>
+<table>
+<thead>
+<tr>
+<th scope=\"col\">Report</th>
+<th scope=\"col\">Format</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Philosophy Degrees Completed by Award Level</td><td><a href=\"/philosophy/reports?rpt=awlevel_count\">HTML</a></td></tr>
+<tr><td>Philosophy Degrees Completed by Institution</td><td><a href=\"/philosophy/reports?rpt=inst_count\">HTML</a></td></tr>
+<tr><td>Philosophy Degrees Completed by State</td><td><a href=\"/philosophy/reports?rpt=state_count\">HTML</a></td></tr>
+<tr><td>Philosophy Degrees Completed by Subject Classification</td><td><a href=\"/philosophy/reports?rpt=cip_count\">HTML</a></td></tr>
+</tbody>
+</table>
+</div>
+</body>
+</html>")
 
 
 (defn reports-html [qry-map] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/philosophy-usa.db"}
@@ -58,34 +98,10 @@
 
 (defresource res-reports [ctx] :allowed-methods [:get :options] :available-media-types ["text/html"] :handle-ok report-query)
 
-
-
 (defresource res-philosophy [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (fn [ctx] (html5  {:lang "en"}
-                                    [:head html-style-css] 
-
-                                    [:body
-                                     [:div {:id "header"}
-                                      [:h3 "Philosopy USA"]
-                                      [:p "Philosophy and religious studies degrees completed during the 2014-2015 academic year."] 
-                                      [:p "Data taken from the Integrated Postsecondary Education Data System (IPEDS)"]
-                                      [:p [:a {:href "https://nces.ed.gov/ipeds/Home/UseTheData"} "https://nces.ed.gov/ipeds/Home/UseTheData"]]]
-                                   
-                                     [:div {:id "reports"}          
-                                      [:h4 "Reports"]
-                                      [:table
-                                       [:thead
-                                        [:tr [:th {:scope "col"} "Report"][:th {:scope "col"} "Format"]]]
-                                       [:tbody
-                                        [:tr [:td "Philosophy Degrees Completed by Award Level"][:td [:a {:href "/philosophy/reports?rpt=awlevel_count"} "HTML"]]]                                    
-                                        [:tr [:td "Philosophy Degrees Completed by Institution"][:td [:a {:href "/philosophy/reports?rpt=inst_count"} "HTML"]]]
-                                        [:tr [:td "Philosophy Degrees Completed by State"][:td [:a {:href "/philosophy/reports?rpt=state_count"} "HTML"]]]
-                                        [:tr [:td "Philosophy Degrees Completed by Subject Classification"][:td [:a {:href "/philosophy/reports?rpt=cip_count"} "HTML"]]]]]]])))
-                                     
-                                        
-
+             :handle-ok (render philosophy-root-template))
 
 
 (defroutes philosophy-routes  
