@@ -2,20 +2,18 @@
   (:require [liberator.core :refer [resource defresource]]
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
-            [hiccup.core :refer [html]]
-            [hiccup.page :refer [doctype html5]]
             [cljstache.core :refer [render]]
-            [clojure.java.jdbc :as sql]
-            [eric-ervin-dot-org.representation :refer [html-style-css map-html-table-td map-html-table-tr]]))
+            [clojure.java.jdbc :as sql]))
+            ;;[eric-ervin-dot-org.representation :refer [html-style-css map-html-table-td map-html-table-tr]]))
 
 
 (def gematria-root-template "<!DOCTYPE html>
-    <html lang=\"en\"><head><style>table,th,td {}
+    <html lang=\"en\"><head><style>table,th,td {
                                border: 1px solid black;
                                border-collapse: collapse;
                                padding: 3px;
                                text-align: center
-                               
+                               }
                              td {text-align: left}</style>
     </head>
     <body>
@@ -71,6 +69,31 @@
   </body>
   </html>")
 
+(def gematria-value-template "
+     <!DOCTYPE html>
+     <html lang=\"en\">
+     <head>
+     <style>table,th,td {
+                 border: 1px solid black;
+                 border-collapse: collapse;
+                 padding: 3px;
+                 text-align: center
+                 }              
+                 td {text-align: left}
+                 
+      </style>
+      </head>
+      <body>
+      <table>
+      <tr>
+      <th>Word</th><th>Value</th></tr>
+      {{#results}}
+      <tr>{{#result}}<td>{{.}}</td>{{/result}}</tr>
+      {{/results}}
+      </table>
+      </body>
+      </html>")
+
 (defn calculate-word-value [wrd]
   (let [word wrd
         lc-word (clojure.string/lower-case wrd)
@@ -82,65 +105,39 @@
       :value-pairs (vec value-pairs)
       :totalvalue total-value}))
 
-(defn query-table [qry-map] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/gematria.db"}
-                                  qry (:query qry-map)
-                                  header (:header qry-map)
-                                  results (sql/query db-spec [qry] {:as-arrays? true})
-                                  report-rows (map map-html-table-tr (rest results))]
-                                 (html
-                                   [:table 
-                                    [:tr (map #(html [:th %]) header)]
-                                    report-rows])))
 
-(defn query-table2 [query] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/gematria.db"}
-                                 qry query
-                                 results (sql/query db-spec [qry] {:as-arrays? true})
-                                 result-rows (map #(hash-map :result %) (rest results))]
-                             
-                             result-rows))
+(defn query-table [query] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/gematria.db"}
+                                qry query
+                                results (sql/query db-spec [qry] {:as-arrays? true})
+                                result-rows (map #(hash-map :result %) (rest results))]
+                            
+                            result-rows))
 
-;;(defn calculate-word-html [wrd]
-;;  (let [wrd-map (calculate-word-value wrd)
-;;        html-header [:tr (map #(html [:th %]) (conj (vec wrd) "total"))]
-;;  html-result [:tr (map #(html [:td %]) (conj (:values wrd-map) (:totalvalue wrd-map)))] 
-;;  (html5  {:lang "en"}
-;;  [:head html-style-css] 
-;;  [:body [:div {:id "header"}
-;;          [:table html-header html-result]
-;;  [:br][:br]
-;;  [:div {:id "etc"}
-;;   [:p "Others with same value"][:br]
-;;  (query-table {:header ["Word" "Value"] 
-;;                :query (str "Select word, wordvalue 
-;;                         from gematria 
-;;                         where wordvalue = \"" (:totalvalue wrd-map) "\"
-;;                         order by word"))
 
 (defn calculate-word-html [wrd]
   (let [wrd-map (calculate-word-value wrd)
-        ;;word-header (map #(:th %) (conj (vec wrd) "total"))
         word-result (conj (:values wrd-map) (:totalvalue wrd-map))
         query (str "Select word, wordvalue from gematria where wordvalue = \"" (:totalvalue wrd-map) "\" order by word")
-        other-results (query-table2 query) 
+        other-results (query-table query) 
         output-map {:wrd-vec (conj (vec wrd) "total")
                     :wrd-result word-result
                     :other-results other-results}]
     (render gematria-word-template output-map))) 
     
 
+(defn find-by-value-html [vl]
+  (let [query (str "Select word, wordvalue from gematria where wordvalue = \"" vl "\" order by word")
+        results (query-table query)
+        output-map {:results results}] 
+    (render gematria-value-template output-map)))
+
+
 (defresource res-value [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (fn [ctx] 
+             :handle-ok (fn [ctx]
                           (let [val (get-in ctx [:request :params "value"])]
-                           (html5  {:lang "en"}
-                             [:head html-style-css]
-                             [:body
-                              (query-table {:header ["Word" "Value"] 
-                                            :query (str "Select word, wordvalue 
-                                                     from gematria 
-                                                     where wordvalue = \"" val "\"
-                                                     order by word")})]))))
+                            (find-by-value-html val))))
                                         
 
 (defresource res-word [ctx]
@@ -153,8 +150,8 @@
 (defresource res-gematria [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (render gematria-root-template)) 
-                                          
+             :handle-ok (render gematria-root-template))
+
 (defroutes gematria-routes  
   (ANY "/gematria" [] res-gematria)
   (ANY "/gematria/word" [] res-word)
