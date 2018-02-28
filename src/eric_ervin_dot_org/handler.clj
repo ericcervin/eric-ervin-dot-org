@@ -1,5 +1,6 @@
 (ns eric-ervin-dot-org.handler
   (:require [liberator.core :refer [resource defresource]]
+            [liberator.representation :refer [ring-response]]
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [cljstache.core :refer [render]]
@@ -33,7 +34,7 @@
                                 {:name "Serialism"  :path "/serialism"  :last-updated "N/A" :desc "Toying with set theory and dodecaphony"}]})
                      
 
-(def root-string
+(def root-template
   
   "
   <!DOCTYPE html>
@@ -70,11 +71,16 @@
   </html>
   ")
 
+(def not-found-template "<!DOCTYPE html><html lang=\"en\"><head><title>Error 404 Not Found</title></head><body>404 - Not Found</body></html>")
+
 (defresource root [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (render root-string resource-list)
-             :handle-not-found "oops")
+             :handle-ok (render root-template resource-list))
+
+(defresource not-found [ctx]
+      :available-media-types ["text/html"]
+      :handle-ok (fn [ctx] (ring-response {:status 404 :body (render not-found-template)})))
 
 (defroutes app-routes
   (ANY "/" [] root)
@@ -93,7 +99,9 @@
   
   powerball-routes
   
-  serialism-routes)
+  serialism-routes
+  
+  (ANY "*" [_] not-found))
   
   
 (def app
