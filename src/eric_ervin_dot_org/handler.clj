@@ -25,7 +25,7 @@
              :handle-ok (fn [ctx] (:request ctx)))
 
 
-(def resource-list {:resources [{:name "Destiny"    :path "/destiny"    :last-updated "02/07/2018" :desc "Star Wars Destiny card game data"}
+(def resource-list {:resources [{:name "Destiny"    :path "/destiny"    :last-updated "02/28/2018" :desc "Star Wars Destiny card game data"}
                                 {:name "Discogs"    :path "/discogs"    :last-updated "12/16/2017" :desc "Albums I've cataloged"}
                                 {:name "Gematria"   :path "/gematria"   :last-updated "N/A" :desc "The numerical value of words"}
                                 {:name "Philosophy" :path "/philosophy" :last-updated "12/23/2017" :desc "Philosophy degrees completed during the 2014-2015 academic year"}
@@ -73,7 +73,8 @@
 (defresource root [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (render root-string resource-list))
+             :handle-ok (render root-string resource-list)
+             :handle-not-found "oops")
 
 (defroutes app-routes
   (ANY "/" [] root)
@@ -92,8 +93,8 @@
   
   powerball-routes
   
-  serialism-routes
-  )
+  serialism-routes)
+  
   
 (def app
   (wrap-params app-routes))
