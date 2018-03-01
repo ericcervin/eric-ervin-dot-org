@@ -55,6 +55,7 @@
   <p>A toy website to release some Clojure into the world.</p>
   <p>Though it's a toy, these are resources I use. (Except that I've quit playing Powerball)</p>
   <p><a href=\"https://github.com/ericcervin/eric-ervin-dot-org\">https://github.com/ericcervin/eric-ervin-dot-org</a></p>
+  <p>There is a (twin) sister site written in JavaScript: <a href = \"http://ericervin.com\">http://ericervin.com</a>
   <br>
   </div>
   <div id=\"resources\">
