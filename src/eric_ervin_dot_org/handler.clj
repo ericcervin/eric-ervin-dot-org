@@ -4,6 +4,7 @@
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [cljstache.core :refer [render]]
+            [clj-time.core :as t]
             [eric-ervin-dot-org.routes.discogs   :refer [discogs-routes]]
             [eric-ervin-dot-org.routes.destiny   :refer [destiny-routes]]
             [eric-ervin-dot-org.routes.gematria   :refer [gematria-routes]]
@@ -12,7 +13,11 @@
             [eric-ervin-dot-org.routes.serialism :refer [serialism-routes]]))
             
 
-
+(defn wrap-log-request [handler]
+  (fn [req]
+    (let [log-string (str (:uri req) "\t" (:query-string req) "\t" (:request-method req) "\t" (clj-time.core/now) " UTC")]
+     (println log-string)
+     (handler req))))
 
 
 (defresource echo_context [ctx]                           
@@ -106,4 +111,4 @@
   
   
 (def app
-  (wrap-params app-routes))
+  (wrap-log-request (wrap-params app-routes)))
