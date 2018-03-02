@@ -7,7 +7,8 @@
                  [org.clojure/java.jdbc "0.6.1"]
                  [org.xerial/sqlite-jdbc "3.20.0"]
                  [hiccup "1.0.4"]
-                 [cljstache "2.0.1"]]    
+                 [cljstache "2.0.1"]
+                 [clj-time "0.14.2"]]
   :plugins [[lein-ring "0.9.7"]]
   :ring {:handler eric-ervin-dot-org.handler/app
          :auto-reload true
