@@ -2,10 +2,43 @@
   (:require [liberator.core :refer [resource defresource]]
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
+            [cljstache.core :refer [render]]
             [hiccup.core :refer [html]]
             [hiccup.page :refer [doctype html5]]
             [eric-ervin-dot-org.representation :refer [html-style-css]]))
 
+(def powerball-root-template "
+<!DOCTYPE html>
+  <html lang=\"en\">
+  <head>
+  <style>
+  table,th,td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding: 3px;
+        text-align: center
+        }
+  td {text-align: left}
+</style>
+<title>Powerball</title>
+</head>
+<body>
+<div id=\"header\">
+  <h3>Powerball</h3>
+  <p>Two sets of Powerball numbers</p>
+</div>
+<div id=\"numbers\">
+  <table>
+    <thead>
+      <tr><th scope=\"col\">Numbers</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><a href=\"/powerball/html\">HTML</a></td></tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>")
 
 (defn powerball-row-map []
   (let [white-balls (vec (take 5 (shuffle (range 1 70))))
@@ -33,59 +66,22 @@
            [:table  [:tr [:th "1"][:th "2"][:th "3"][:th "4"][:th "5"][:th "pb"]]
             (powerball-row-html)
             (powerball-row-html)]]))
-
-(defn powerball-json [_]  
-     {:set-1 (powerball-row-map)
-      :set-2 (powerball-row-map)})
-
-(defn powerball-text [_]  
-  (let [r1 (powerball-row-map)
-        r2 (powerball-row-map)]
-    
-    (str (:ball-1 r1) "\t" (:ball-2 r1) "\t" (:ball-3 r1) "\t" (:ball-4 r1) "\t" (:ball-5 r1) "\t(" (:pb r1) ")\n"
-         (:ball-1 r2) "\t" (:ball-2 r2) "\t" (:ball-3 r2) "\t" (:ball-4 r2) "\t" (:ball-5 r2) "\t(" (:pb r2) ")\n")))
       
 
 (defresource res-powerball [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (fn [ctx] (html5  {:lang "en"}
-                                    [:head html-style-css] 
-
-                                    [:body
-                                     [:div {:id "header"}
-                                      [:h3 "Powerball"]
-                                      [:p "Two sets of Powerball numbers"]]
-                                     [:div {:id "numbers"}
-                                      [:table
-                                       [:thead
-                                        [:tr [:th {:scope "col"} "Numbers"]]]
-                                       [:tbody
-                                        [:tr [:td [:a {:href "/powerball/html"} "HTML"]]]
-                                        [:tr [:td [:a {:href "/powerball/json"} "JSON"]]]
-                                        [:tr [:td [:a {:href "/powerball/text"} "TEXT"]]]]]]])))
+             :handle-ok (render powerball-root-template))
 
 (defresource res-powerball-html [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
              :handle-ok powerball-html)
-
-(defresource res-powerball-json [ctx]
-             :allowed-methods [:get :options]
-             :available-media-types ["application/json"]
-             :handle-ok powerball-json)
-
-(defresource res-powerball-text [ctx]
-             :allowed-methods [:get :options]
-             :available-media-types ["text/plain"]
-             :handle-ok powerball-text)
-
                                          
 
 (defroutes powerball-routes
   
   (ANY "/powerball" [] res-powerball)
-  (ANY "/powerball/html" [] res-powerball-html)
-  (ANY "/powerball/json" [] res-powerball-json)
-  (ANY "/powerball/text" [] res-powerball-text))
+  (ANY "/powerball/html" [] res-powerball-html))
+  
   
