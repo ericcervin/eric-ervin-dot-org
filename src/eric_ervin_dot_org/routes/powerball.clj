@@ -2,10 +2,32 @@
   (:require [liberator.core :refer [resource defresource]]
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
-            [cljstache.core :refer [render]]
-            [hiccup.core :refer [html]]
-            [hiccup.page :refer [doctype html5]]
-            [eric-ervin-dot-org.representation :refer [html-style-css]]))
+            [cljstache.core :refer [render]]))
+            ;;[eric-ervin-dot-org.representation :refer [html-style-css]]))
+
+(def powerball-result-template "
+<!DOCTYPE html>
+<html lang=\"en\">
+<head>
+  <style>table,th,td {
+               border: 1px solid black;
+               border-collapse: collapse;
+               padding: 3px;
+  text-align: center
+  }
+  td {text-align: left}
+  </style>
+  <title>Powerball</title>
+</head>
+<body>
+  <table>
+  <tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>pb</th></tr>
+  <tr><td>{{row-1.ball-1}}</td><td>{{row-1.ball-2}}</td><td>{{row-1.ball-3}}</td><td>{{row-1.ball-4}}</td><td>{{row-1.ball-5}}</td><td>{{row-1.pb}}</td></tr>
+  <tr><td>{{row-2.ball-1}}</td><td>{{row-2.ball-2}}</td><td>{{row-2.ball-3}}</td><td>{{row-2.ball-4}}</td><td>{{row-2.ball-5}}</td><td>{{row-2.pb}}</td></tr>
+  </table>
+</body>
+</html>")
+
 
 (def powerball-root-template "
 <!DOCTYPE html>
@@ -47,25 +69,10 @@
         pb-r-map (assoc pb-r-map :pb pb)]
     pb-r-map))       
 
-(defn powerball-row-html []
-  (let [pbrm (powerball-row-map)] 
-    (html [:tr 
-           [:td (format "%02d"  (:ball-1 pbrm))] 
-           [:td (format "%02d"  (:ball-2 pbrm))]
-           [:td (format "%02d"  (:ball-3 pbrm))]
-           [:td (format "%02d"  (:ball-4 pbrm))]
-           [:td (format "%02d"  (:ball-5 pbrm))]
-           [:td (format "%02d"  (:pb pbrm))]])))
-          
-
 (defn powerball-html [_]  
-  (html5  {:lang "en"}
-          [:head html-style-css] 
-           
-          [:body        
-           [:table  [:tr [:th "1"][:th "2"][:th "3"][:th "4"][:th "5"][:th "pb"]]
-            (powerball-row-html)
-            (powerball-row-html)]]))
+  (let [output-map {:row-1 (powerball-row-map)
+                    :row-2 (powerball-row-map)}]
+     (render powerball-result-template output-map)))
       
 
 (defresource res-powerball [ctx]
@@ -73,7 +80,7 @@
              :available-media-types ["text/html"]
              :handle-ok (render powerball-root-template))
 
-(defresource res-powerball-html [ctx]
+(defresource res-powerball-result [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
              :handle-ok powerball-html)
@@ -82,6 +89,6 @@
 (defroutes powerball-routes
   
   (ANY "/powerball" [] res-powerball)
-  (ANY "/powerball/html" [] res-powerball-html))
+  (ANY "/powerball/html" [] res-powerball-result))
   
   
