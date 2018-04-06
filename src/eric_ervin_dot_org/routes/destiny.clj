@@ -3,8 +3,8 @@
             [ring.middleware.params :refer [wrap-params]]
             [compojure.core :refer [defroutes ANY GET OPTIONS]]
             [cljstache.core :refer [render]]
-            [clojure.java.jdbc :as sql]
-            ))
+            [clojure.java.jdbc :as sql]))
+            
 (def destiny-root-map {:reports [
                                  {:text "Compatible with Villains, Command" :key "villain_command_compatible"}
                                  {:text "Count by Affiliation/Faction" :key "affiliation_faction_count"}
@@ -36,7 +36,7 @@
   </head>
   <body>
   <div id=\"header\">
-  <h3>Star Wars Destiny</h3>
+  <h1>Star Wars Destiny</h1>
   <br>
   </div>
   <div id=\"cards\">
