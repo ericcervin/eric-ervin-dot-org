@@ -91,7 +91,7 @@
   </head>
   <body>
   <div id=\"report\">
-  <table>
+  <table id = \"id_card_table\">
   <thead>
   <tr>{{#header}}<th>{{{.}}}</th>{{/header}}</tr>
   </thead>
