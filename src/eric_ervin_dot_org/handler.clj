@@ -88,12 +88,18 @@
       :available-media-types ["text/html"]
       :handle-ok (fn [ctx] (ring-response {:status 404 :body (render not-found-template)})))
 
+(defresource robots [ctx]
+             :available-media-types ["text/plain"]
+             :handle-ok (str "User-agent: *\nDisallow: /\n"))
+
 (defroutes app-routes
   (ANY "/" [] root)
   
   (ANY "/echo_context" [] echo_context)
   
   (ANY "/echo_request" [] echo_request)
+  
+  (GET "/robots.txt" [] robots)
   
   destiny-routes
   
