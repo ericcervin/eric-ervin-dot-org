@@ -23,7 +23,7 @@
 </head>
 <body>
 <div id=\"header\">
-  <h3>Philosopy USA</h3>
+  <h1>Philosophy USA</h1>
   <p>Philosophy and religious studies degrees completed during the 2014-2015 academic year.</p>
   <p>Data taken from the Integrated Postsecondary Education Data System (IPEDS)</p>
   <p><a href=\"https://nces.ed.gov/ipeds/Home/UseTheData\">https://nces.ed.gov/ipeds/Home/UseTheData</a></p>
