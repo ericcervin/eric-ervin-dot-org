@@ -24,7 +24,7 @@
       </head>
       <body>
         <div id=\"header\">
-          <h3>Serialism</h3>
+          <h1>Serialism</h1>
           <p>Rows and rows of numbers</p>
         </div>
         <div id=\"numbers\">
