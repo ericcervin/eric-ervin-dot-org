@@ -12,6 +12,7 @@
      "<!DOCTYPE html>
       <html lang=\"en\">
         <head>
+        <title>Discogs</title>
           <style> table,th,td {
                   border: 1px solid black;
                   border-collapse: collapse;
@@ -21,7 +22,7 @@
           </style>
        </head>
        <body>
-         <table>
+         <table id = \"id_release_table\">
            <thead><tr>{{#header}}<th>{{.}}</th>{{/header}}</tr></thead>
            <tbody>
            {{#results}}
