@@ -44,6 +44,7 @@
      "<!DOCTYPE html>
       <html lang=\"en\">
       <head>
+          <title>Gematria</title>
           <style>table,th,td {
                  border: 1px solid black;
                  border-collapse: collapse;
@@ -54,7 +55,7 @@
       </style></head>
       <body>
       <div id=\"header\">
-      <table>
+      <table id = 'id_word_value_table'>
       <tr>{{#wrd-vec}}<th>{{.}}</th>{{/wrd-vec}}</tr>
       <tr>{{#wrd-result}}<td>{{.}}</td>{{/wrd-result}}</tr></table>
   </div>
@@ -62,7 +63,7 @@
   <div id=\"etc\">
   <p>Others with same value</p>
   <br>
-  <table>
+  <table id = 'id_other_word_table'>
   <tr><th>Word</th><th>Value</th></tr>
    {{#other-results}}
    <tr>{{#result}}<td>{{.}}</td>{{/result}}</tr>
