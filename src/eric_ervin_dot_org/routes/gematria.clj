@@ -77,6 +77,7 @@
      <!DOCTYPE html>
      <html lang=\"en\">
      <head>
+     <title>Gematria</title>
      <style>table,th,td {
                  border: 1px solid black;
                  border-collapse: collapse;
@@ -88,7 +89,7 @@
       </style>
       </head>
       <body>
-      <table>
+      <table id = 'id_word_value_table'>
       <tr>
       <th>Word</th><th>Value</th></tr>
       {{#results}}
