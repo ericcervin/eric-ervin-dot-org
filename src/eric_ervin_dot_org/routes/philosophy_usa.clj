@@ -52,6 +52,7 @@
 <!DOCTYPE html>
 <html lang=\"en\">
   <head>
+  <title>Philosophy USA</title>
   <style>table,th,td {
                border: 1px solid black;
                border-collapse: collapse;
@@ -60,10 +61,10 @@
   }
                td {text-align: left}
   </style>
-<title>Philosophy USA</title>
-</head>
-<body>
-  <table>
+
+  </head>
+  <body>
+  <table id = 'id_result_table'>
     <thead>
       <tr>{{#header}}<th>{{{.}}}</th>{{/header}}</tr>
     </thead>
