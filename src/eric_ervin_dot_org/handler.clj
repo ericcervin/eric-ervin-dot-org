@@ -30,6 +30,11 @@
              :available-media-types ["text/plain"]
              :handle-ok (fn [ctx] (:request ctx)))
 
+(defresource echo_route_param [ctx]
+             :allowed-methods [:get :options]
+             :available-media-types ["text/plain"]
+             :handle-ok (fn [ctx] (get-in ctx [:request :route-params :etc])))
+
 
 (def resource-list {:resources [{:name "Destiny"    :path "/destiny"    :last-updated "05/22/2018" :desc "Star Wars Destiny card game data"}
                                 {:name "Discogs"    :path "/discogs"    :last-updated "12/16/2017" :desc "Albums I've cataloged"}
@@ -97,7 +102,9 @@
   
   (ANY "/echo_context" [] echo_context)
   
-  (ANY "/echo_request" [] echo_request)
+  (ANY "/echo_request/" [] echo_request)
+  
+  (ANY "/echo_route_param/:etc" [] echo_route_param)
   
   (GET "/robots.txt" [] robots)
   
