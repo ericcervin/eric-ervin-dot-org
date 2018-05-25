@@ -84,9 +84,9 @@
         <thead><tr>
         <th scope=\"col\">Report</th><th scope=\"col\">Format</th></tr></thead>
         <tbody>
-          <tr><td>Count by Artist</td><td><a href=\"/discogs/reports?rpt=artist_count\">HTML</a></td></tr>
-          <tr><td>Count by Label</td><td><a href=\"/discogs/reports?rpt=label_count\">HTML</a></td></tr>
-          <tr><td>Count by Year Released</td><td><a href=\"/discogs/reports?rpt=year_count\">HTML</a></td></tr>
+          <tr><td>Count by Artist</td><td><a href=\"/discogs/reports/artist_count\">HTML</a></td></tr>
+          <tr><td>Count by Label</td><td><a href=\"/discogs/reports/label_count\">HTML</a></td></tr>
+          <tr><td>Count by Year Released</td><td><a href=\"/discogs/reports/year_count\">HTML</a></td></tr>
         </tbody>
       </table></div></body></html>")
   
@@ -109,7 +109,7 @@
              :handle-ok (render discogs-root-template))
 
 (defn report-query [ctx] 
-       (if-let [qry-map (condp = (get-in ctx [:request :params "rpt"])  
+       (if-let [qry-map (condp = (get-in ctx [:request :route-params :report])  
                               "artist_count" 
                               {:header ["Artist" "Count"] 
                                :query "Select artist, count(*) as count from release group by artist order by count(*) DESC"}
@@ -133,6 +133,6 @@
 (defroutes discogs-routes  
   (ANY "/discogs" [] res-discogs)
   (ANY "/discogs/releases" [] res-releases)
-  (ANY "/discogs/reports" [] res-reports))
+  (ANY "/discogs/reports/:report" [] res-reports))
   
   
