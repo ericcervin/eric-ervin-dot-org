@@ -64,7 +64,7 @@
   <h4>Reports</h4>
   <table>
   {{#reports}}
-  <tr><td>{{text}}</td><td><a href=\"/destiny/reports?rpt={{key}}\">HTML</a></td></tr>
+  <tr><td>{{text}}</td><td><a href=\"/destiny/reports/{{key}}\">HTML</a></td></tr>
   {{/reports}}
   </table>
   </div>
@@ -145,7 +145,7 @@
        (reports-html qry-map)))
 
 (defn report-query [ctx] 
-       (if-let [qry-map (condp = (get-in ctx [:request :params "rpt"])  
+       (if-let [qry-map (condp = (get-in ctx [:request :route-params :report])  
                               "affiliation_faction_count" 
                               {:header ["Affilliation" "Faction" "Count"] 
                                :query "Select affiliation, faction, count(*) as count from card group by affiliation, faction"}
@@ -196,6 +196,6 @@
 (defroutes destiny-routes  
   (ANY "/destiny" [] res-destiny)
   (ANY "/destiny/cards" [] res-cards)
-  (ANY "/destiny/reports" [] res-reports))
+  (ANY "/destiny/reports/:report" [] res-reports))
   
           
