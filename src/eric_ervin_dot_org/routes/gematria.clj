@@ -26,13 +26,13 @@
     </div>
     <div id=\"word_form\">
     <p>Calculate the numerical value of a word.</p>
-    <form action=\"/gematria/word\" method=\"get\">
+    <form action=\"/gematria/search\" method=\"get\">
     <input id=\"id_word_input\" name=\"word\" type=\"text\">
     <input type=\"submit\" value=\"Calculate\"></form>
     </div>
     <div id=\"value_form\">
     <p>Search the 10,000 most common English words by numerical value.</p>
-    <form action=\"/gematria/value\" method=\"get\">
+    <form action=\"/gematria/search\" method=\"get\">
     <input id=\"id_value_input\" name=\"value\" type=\"text\">
     <input type=\"submit\" value=\"Search\">
     </form>
@@ -152,6 +152,17 @@
                            (let [wrd (get-in ctx [:request :params "word"])]
                              (calculate-word-html wrd))))
 
+(defresource res-search [ctx]
+             :allowed-methods [:get :options]
+             :available-media-types ["text/html"]
+             :handle-ok (fn [ctx] 
+                           (let [params (get-in ctx [:request :params])]
+                             (cond 
+                               (contains? params "word") (calculate-word-html (params "word"))
+                               (contains? params "value") (find-by-value-html (params "value"))))))
+                               
+
+
 (defresource res-gematria [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
@@ -160,7 +171,8 @@
 (defroutes gematria-routes  
   (ANY "/gematria" [] res-gematria)
   (ANY "/gematria/word" [] res-word)
-  (ANY "/gematria/value" [] res-value))
+  (ANY "/gematria/value" [] res-value)
+  (ANY "/gematria/search" [] res-search))
 
   
   
