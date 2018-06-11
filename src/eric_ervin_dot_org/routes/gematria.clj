@@ -137,20 +137,7 @@
     (render gematria-value-template output-map)))
 
 
-(defresource res-value [ctx]
-             :allowed-methods [:get :options]
-             :available-media-types ["text/html"]
-             :handle-ok (fn [ctx]
-                          (let [val (get-in ctx [:request :params "value"])]
-                            (find-by-value-html val))))
-                                        
 
-(defresource res-word [ctx]
-             :allowed-methods [:get :options]
-             :available-media-types ["text/html"]
-             :handle-ok (fn [ctx] 
-                           (let [wrd (get-in ctx [:request :params "word"])]
-                             (calculate-word-html wrd))))
 
 (defresource res-search [ctx]
              :allowed-methods [:get :options]
@@ -170,8 +157,6 @@
 
 (defroutes gematria-routes  
   (ANY "/gematria" [] res-gematria)
-  (ANY "/gematria/word" [] res-word)
-  (ANY "/gematria/value" [] res-value)
   (ANY "/gematria/search" [] res-search))
 
   
