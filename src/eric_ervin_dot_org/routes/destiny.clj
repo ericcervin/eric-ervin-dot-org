@@ -135,13 +135,13 @@
 (defn cards-query [ctx] 
   (let [affil (get-in ctx [:request :params "affil"])
         fact (get-in ctx [:request :params "fact"])
-        select-fields "cardsetcode, position, name, typename, isunique, raritycode, affiliation, factioncode, cminpoints, cmaxpoints, chealth, csides,imgsrc"
+        select-fields "cardsetcode, position, name, typename, isunique, raritycode, affiliation, factioncode, cminpoints, cmaxpoints, chealth, ccost, csides,imgsrc"
         qry-str (cond (and (nil? affil) (nil? fact))  (str "Select " select-fields " from card")
                       (and (nil? affil) (some? fact)) (str "Select " select-fields " from card where faction = \"" fact "\"")
                       (and (some? affil) (nil? fact)) (str "Select " select-fields " from card where affiliation = \"" affil "\"")
                       :else (str "Select " select-fields " from card where affiliation = \"" affil "\" and faction = \"" fact "\""))
         qry-map {:header ["Set" "Pos" "Name" "Type" "Unique" "Rarity" "Affil" "Faction" 
-                          "Min<br>Cost" "Max<br>Cost" "Health" "Sides" "Img Source"]
+                          "Min<br>Points" "Max<br>Points" "Health" "Cost" "Sides" "Img Source"]
                  :query qry-str}]       
        (reports-html qry-map)))
 
