@@ -38,10 +38,10 @@
     </tr>
     </thead>
     <tbody>
-    <tr><td>Philosophy Degrees Completed by Award Level</td><td><a href=\"/philosophy/reports?rpt=awlevel_count\">HTML</a></td></tr>
-    <tr><td>Philosophy Degrees Completed by Institution</td><td><a href=\"/philosophy/reports?rpt=inst_count\">HTML</a></td></tr>
-    <tr><td>Philosophy Degrees Completed by State</td><td><a href=\"/philosophy/reports?rpt=state_count\">HTML</a></td></tr>
-    <tr><td>Philosophy Degrees Completed by Subject Classification</td><td><a href=\"/philosophy/reports?rpt=cip_count\">HTML</a></td></tr>
+    <tr><td>Philosophy Degrees Completed by Award Level</td><td><a href=\"/philosophy/reports/awlevel_count\">HTML</a></td></tr>
+    <tr><td>Philosophy Degrees Completed by Institution</td><td><a href=\"/philosophy/reports/inst_count\">HTML</a></td></tr>
+    <tr><td>Philosophy Degrees Completed by State</td><td><a href=\"/philosophy/reports/state_count\">HTML</a></td></tr>
+    <tr><td>Philosophy Degrees Completed by Subject Classification</td><td><a href=\"/philosophy/reports/cip_count\">HTML</a></td></tr>
     </tbody>
   </table>
 </div>
@@ -91,7 +91,7 @@
 
 
 (defn report-query [ctx] 
-       (if-let [qry-map (condp = (get-in ctx [:request :params "rpt"])  
+       (if-let [qry-map (condp = (get-in ctx [:request :route-params :report])  
                               "state_count" 
                               {:header ["State" "Count"] 
                                :query "Select stabbr, count(*) as count 
@@ -137,7 +137,7 @@
 
 (defroutes philosophy-routes  
   (ANY "/philosophy" [] res-philosophy)
-  (ANY "/philosophy/reports" [] res-reports))
+  (ANY "/philosophy/reports/:report" [] res-reports))
   
   
 
