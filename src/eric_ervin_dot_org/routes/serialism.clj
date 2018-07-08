@@ -25,12 +25,12 @@
       <body>
         <div id=\"header\">
           <h1>Serialism</h1>
-          <p>Rows and rows of numbers</p>
+          <p>Rows and rows of pitch classes</p>
         </div>
-        <div id=\"numbers\">
+        <div id=\"pcs\">
           <table>
             <thead>
-              <tr><th scope=\"col\">Numbers</th></tr>
+              <tr><th scope=\"col\">Basic Rows</th></tr>
             </thead>
             <tbody>
               <tr><td><a href=\"/serialism/html\">HTML</a></td></tr>
@@ -55,6 +55,7 @@
       <title>Serialism</title>
     </head>
     <body>
+      <p>(t = ten. e = eleven.)</p>
       <table>
         <tbody>
           <tr><th>P0</th>{{#p0}}<td>{{.}}</td>{{/p0}}</tr>
@@ -77,14 +78,16 @@
       new-row))
 
 
+(defn add_e_and_t [n] (condp = n 10 "t" 11 "e" n))
+
 (defn serialism-map [] (let [P0 (vec (shift-to-zero (random-dodeca-row)))
                              R0 (vec (reverse P0))
                              I0 (vec(map #(if (= % 0) 0 (- 12 %)) P0))
                              RI0 (vec(reverse I0))]
-                         {:p0 (map #(format "%02d" %) P0)
-                          :r0 (map #(format "%02d" %) R0)
-                          :i0 (map #(format "%02d" %) I0)
-                          :ri0 (map #(format "%02d" %)RI0)}))
+                            {:p0 (map add_e_and_t P0)
+                             :r0 (map add_e_and_t R0)
+                             :i0 (map add_e_and_t I0)
+                             :ri0 (map add_e_and_t RI0)}))
 
 (defresource res-serialism [ctx]
              :allowed-methods [:get :options]
