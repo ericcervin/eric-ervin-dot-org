@@ -30,10 +30,12 @@
         <div id=\"pcs\">
           <table>
             <thead>
-              <tr><th scope=\"col\">Basic Rows</th></tr>
+              <tr><th scope=\"col\">Basic Rows</th><th scope=\"col\">Square</th></tr>
             </thead>
             <tbody>
-              <tr><td><a href=\"/serialism/html\">HTML</a></td></tr>
+              <tr><td><a href=\"/serialism/rows/html\">HTML</a></td>
+                  <td><a href=\"/serialism/square/html\">HTML</a></td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -41,7 +43,7 @@
     </html>")
 
 
-(def serialism-result-template "
+(def serialism-rows-result-template "
   <!DOCTYPE html>
   <html lang=\"en\">
     <head>  
@@ -67,18 +69,62 @@
     </body>
   </html>")
 
+(def serialism-square-result-template "
+  <!DOCTYPE html>
+  <html lang=\"en\">
+    <head>  
+      <style> table,th,td {
+         border: 1px solid black;
+         border-collapse: collapse;
+         padding: 3px;
+         text-align: center;}
+         td {text-align: left;
+             width: 20px}
+      </style>
+      <title>Serialism</title>
+    </head>
+    <body>
+      <p>(t = ten. e = eleven.)</p>
+      <table>
+        <tbody>
+          {{#sq}}
+          <tr>
+          {{#vl}}
+          <td>{{.}}</td>
+          {{/vl}}
+          </tr>
+          {{/sq}}
+        </tbody>
+      </table>
+    </body>
+  </html>")
+
+
 (defn random-dodeca-row [] (vec (shuffle (range 12))))
 
-(defn absolute-pitch-class [pc] (if (< pc 0) (+ pc 12) pc))
+(defn absolute-pitch-class [pc] (cond (< pc 0) (+ pc 12)
+                                      (> pc 12) (- pc 12)
+                                      (= pc 12) 0
+                                      :else pc))
+
+(defn transpose [n i] (absolute-pitch-class (+ n i)))
+
+(defn transpose-row [rw i] (map #(transpose % i) rw))
 
 (defn shift-to-zero [rw]
      (let [old-row rw
            or0 (rw 0)
-           new-row (map absolute-pitch-class (map #(- % or0) old-row))]
+           shft (* or0 -1)
+           new-row (transpose-row old-row shft)]
+          
       new-row))
 
 
+
 (defn add_e_and_t [n] (condp = n 10 "t" 11 "e" n))
+
+(defn serial-square [rw] (for [i rw]
+                           (hash-map :vl (map add_e_and_t (transpose-row rw (- 12 i))))))
 
 (defn serialism-map [] (let [P0 (vec (shift-to-zero (random-dodeca-row)))
                              R0 (vec (reverse P0))
@@ -87,20 +133,28 @@
                             {:p0 (map add_e_and_t P0)
                              :r0 (map add_e_and_t R0)
                              :i0 (map add_e_and_t I0)
-                             :ri0 (map add_e_and_t RI0)}))
+                             :ri0 (map add_e_and_t RI0)
+                             :sq (serial-square P0)}))
 
 (defresource res-serialism [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
              :handle-ok (render serialism-root-template))
 
-(defresource res-serialism-html [ctx]
+(defresource res-serialism-rows-html [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (render serialism-result-template (serialism-map)))
+             :handle-ok (render serialism-rows-result-template (serialism-map)))
+
+(defresource res-serialism-square-html [ctx]
+             :allowed-methods [:get :options]
+             :available-media-types ["text/html"]
+             :handle-ok (render serialism-square-result-template (serialism-map)))
 
 (defroutes serialism-routes
   (ANY "/serialism" [] res-serialism)
-  (ANY "/serialism/html" [] res-serialism-html))
+  (ANY "/serialism/rows/html" [] res-serialism-rows-html)
+  (ANY "/serialism/square/html" [] res-serialism-square-html))
+  
 
 
