@@ -10,6 +10,7 @@
                                  {:text "Count by Affiliation/Faction" :key "affiliation_faction_count"}
                                  {:text "Count by Rarity" :key "rarity_count"}
                                  {:text "Count by Set" :key "set_count"}
+                                 {:text "Count by Set/Affiliation/Faction (cards with dice)":key "set_affiliation_faction_dice_count"}
                                  {:text "Highest Cost Support/Event/Upgrade" :key "high_cost"}
                                  {:text "Odd Cost Support/Event/Upgrade" :key "odd_cost"}
                                  {:text "Rarity Legendary Cards" :key "legendary"}
@@ -150,6 +151,12 @@
                               "affiliation_faction_count" 
                               {:header ["Affilliation" "Faction" "Count"] 
                                :query "Select affiliation, faction, count(*) as count from card group by affiliation, faction"}
+                              "set_affiliation_faction_dice_count" 
+                              {:header ["Set" "Affilliation" "Faction" "Dice Count"] 
+                               :query "Select cardset, affiliation, faction, count(*) as count 
+                                       from card
+                                       where csides IS NOT NULL
+                                       group by cardset, affiliation, faction"}
                               "rarity_count" 
                               {:header ["Rarity" "Count"] 
                                :query "Select rarity, count(*) as count from card group by rarity"}
