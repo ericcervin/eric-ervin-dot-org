@@ -122,7 +122,7 @@
 (defn calculate-word-html [wrd]
   (let [wrd-map (calculate-word-value wrd)
         word-result (conj (:values wrd-map) (:totalvalue wrd-map))
-        query (str "Select word, wordvalue from gematria where wordvalue = \"" (:totalvalue wrd-map) "\" order by word")
+        query (str "Select word, wordvalue from gematria where wordvalue = \"" (:totalvalue wrd-map) "\" and word != \""  wrd "\" order by word")
         other-results (query-table query) 
         output-map {:wrd-vec (conj (vec wrd) "total")
                     :wrd-result word-result
