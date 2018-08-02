@@ -5,19 +5,7 @@
             [cljstache.core :refer [render]]
             [clojure.java.jdbc :as sql]))
             
-(def destiny-root-map {:reports [
-                                 {:text "Compatible with Villains, Command" :key "villain_command_compatible"}
-                                 {:text "Count by Affiliation/Faction" :key "affiliation_faction_count"}
-                                 {:text "Count by Rarity" :key "rarity_count"}
-                                 {:text "Count by Set" :key "set_count"}
-                                 {:text "Count by Set/Affiliation/Faction (cards with dice)":key "set_affiliation_faction_dice_count"}
-                                 {:text "Highest Cost Support/Event/Upgrade" :key "high_cost"}
-                                 {:text "Odd Cost Support/Event/Upgrade" :key "odd_cost"}
-                                 {:text "Rarity Legendary Cards" :key "legendary"}
-                                 {:text "Rarity Rare Cards" :key "rare"}
-                                 {:text "Type Character Cards" :key  "type_character"}
-                                 {:text "Type Upgrade Cards" :key "type_upgrade"}]
-                         :factions ["Command" "Force" "Rogue" "General"]})
+
                             
 
 
@@ -128,10 +116,7 @@
                                (render destiny-report-template output-map)))
 
 
-(defresource res-destiny [ctx]
-             :allowed-methods [:get :options]
-             :available-media-types ["text/html"]
-             :handle-ok (render destiny-root-template destiny-root-map))
+
 
 (defn cards-query [ctx] 
   (let [affil (get-in ctx [:request :params "affil"])
@@ -149,50 +134,64 @@
 
 (def report-map        {
                         "affiliation_faction_count" 
-                            {:header ["Affilliation" "Faction" "Count"] 
+                            {:title "Count by Affiliation/Faction"
+                             :header ["Affilliation" "Faction" "Count"] 
                              :query "Select affiliation, faction, count(*) as count from card group by affiliation, faction"}
                         "set_affiliation_faction_dice_count"  
-                            {:header ["Set" "Affilliation" "Faction" "Dice Count"] 
+                            {:title "Count by Set/Affiliation/Faction (cards with dice)"
+                             :header ["Set" "Affilliation" "Faction" "Dice Count"] 
                              :query "Select cardset, affiliation, faction, count(*) as count 
                                      from card
                                      where csides IS NOT NULL
                                      group by cardset, affiliation, faction"}
                         "rarity_count" 
-                            {:header ["Rarity" "Count"] 
+                            {:title "Count by Rarity"
+                             :header ["Rarity" "Count"] 
                              :query "Select rarity, count(*) as count from card group by rarity"}
                         "set_count" 
-                            {:header ["Set" "Count"] 
+                            {:title "Count by Set"
+                             :header ["Set" "Count"] 
                              :query "Select cardset, count(*) as count from card group by cardset"}
                         "high_cost" 
-                            {:header ["Set" "Pos" "Name" "Type" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
+                            {:title "Highest Cost Support/Event/Upgrade"
+                             :header ["Set" "Pos" "Name" "Type" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
                              :query "Select cardsetcode, position, name, typename, isunique, raritycode, ccost, csides, imgsrc
                                      from card where ccost is not null 
                                      order by ccost desc"}
                         "legendary" 
-                             {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
+                             {:title "Rarity Legendary Cards"
+                              :header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
                               :query "Select cardsetcode, position, name, typename, affiliation, factioncode, isunique, raritycode, ccost, csides, imgsrc 
                                       from card where rarity = \"Legendary\" "}
                         "odd_cost" 
-                             {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
+                             {:title "Odd Cost Support/Event/Upgrade"
+                              :header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
                               :query "Select cardsetcode, position, name, typename, affiliation, factioncode, isunique, raritycode, ccost, csides, imgsrc 
                                       from card where ccost IN (1,3,5)"}
                         "rare" 
-                             {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
+                             {:title "Rarity Rare Cards"
+                              :header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
                               :query "Select cardsetcode, position, name, typename, affiliation, factioncode, isunique, raritycode, ccost, csides, imgsrc 
                                       from card where rarity = \"Rare\" "}
                         "villain_command_compatible"
-                              {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
+                              {:title "Compatible with Villains, Command"
+                               :header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
                                :query "Select cardsetcode, position, name, typename, affiliation, factioncode, isunique, raritycode, ccost, csides, imgsrc 
                                        from card where (affiliation = \"Villain\" or affiliation = \"Neutral\" ) 
                                        and (faction = \"Command\" or faction = \"General\") "}
                         "type_character"
-                              {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "MinPoints" "MaxPoints" "Health", "Sides" "Image"] 
+                              {:title "Type Character Cards"
+                               :header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "MinPoints" "MaxPoints" "Health", "Sides" "Image"] 
                                :query "Select cardsetcode, position, name, typename, affiliation, factioncode, isunique, raritycode, cminpoints, cmaxpoints, chealth, csides, imgsrc 
                                        from card where typename = \"Character\" "}
                         "type_upgrade"
-                               {:header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
+                               {:title "Type Upgrade Cards"
+                                :header ["Set" "Pos" "Name" "Type" "Affilliation" "Faction" "Is Unique" "Rarity" "Cost" "Sides" "Image"] 
                                 :query "Select cardsetcode, position, name, typename, affiliation, faction, isunique, raritycode, ccost, csides, imgsrc 
                                         from card where typename = \"Upgrade\" "}})
+
+(def destiny-root-map {:reports (map #(hash-map :text (:title (last %)) :key (first %)) (sort-by #(:title (last %)) report-map))
+                       :factions ["Command" "Force" "Rogue" "General"]})
 
 (defn report-query [ctx] 
        (let [rpt (get-in ctx [:request :route-params :report])
@@ -200,8 +199,20 @@
          (if qry-map (reports-html qry-map) "<HTML><HEAD></HEAD><BODY>Invalid report name</BODY>")))
 
 
-(defresource res-cards [ctx] :allowed-methods [:get :options] :available-media-types ["text/html"] :handle-ok cards-query)
-(defresource res-reports [ctx] :allowed-methods [:get :options] :available-media-types ["text/html"] :handle-ok report-query)
+(defresource res-cards [ctx] 
+             :allowed-methods [:get :options] 
+             :available-media-types ["text/html"] 
+             :handle-ok cards-query)
+
+(defresource res-destiny [ctx]
+             :allowed-methods [:get :options]
+             :available-media-types ["text/html"]
+             :handle-ok (render destiny-root-template destiny-root-map))
+
+(defresource res-reports [ctx] 
+             :allowed-methods [:get :options] 
+             :available-media-types ["text/html"] 
+             :handle-ok report-query)
 
 (defroutes destiny-routes  
   (ANY "/destiny" [] res-destiny)
