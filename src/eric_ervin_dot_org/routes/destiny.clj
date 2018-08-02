@@ -67,7 +67,7 @@
   <!DOCTYPE html>
   <html lang=\"en\">
   <head>
-  <title>Destiny</title>
+  <title>{{title}}</title>
   <style>
   table,th,td {
                                border: 1px solid black;
@@ -81,6 +81,7 @@
   </head>
   <body>
   <div id=\"report\">
+  <h3>{{title}}</h3>
   <table id = \"id_card_table\">
   <thead>
   <tr>{{#header}}<th>{{{.}}}</th>{{/header}}</tr>
@@ -108,9 +109,11 @@
 (defn reports-html [qry-map] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/destiny.db"}
                                    qry (:query qry-map)
                                    header (:header qry-map)
+                                   title (:title qry-map)
                                    results (sql/query db-spec [qry] {:as-arrays? true})
                                    results (map html-for-result (rest results))
-                                   output-map {:header header
+                                   output-map {:title title
+                                               :header header
                                                :results (vec (map #(hash-map :result (vector-of-maps %)) results))}]
                                
                                (render destiny-report-template output-map)))
