@@ -129,7 +129,8 @@
                       (and (nil? affil) (some? fact)) (str "Select " select-fields " from card where faction = \"" fact "\"")
                       (and (some? affil) (nil? fact)) (str "Select " select-fields " from card where affiliation = \"" affil "\"")
                       :else (str "Select " select-fields " from card where affiliation = \"" affil "\" and faction = \"" fact "\""))
-        qry-map {:header ["Set" "Pos" "Name" "Type" "Unique" "Rarity" "Affil" "Faction" 
+        qry-map {:title (str affil " " fact " " "Cards")
+                 :header ["Set" "Pos" "Name" "Type" "Unique" "Rarity" "Affil" "Faction" 
                           "Min<br>Points" "Max<br>Points" "Health" "Cost" "Sides" "Img Source"]
                  :query qry-str}]       
        (reports-html qry-map)))
