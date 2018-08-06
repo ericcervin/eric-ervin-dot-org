@@ -100,43 +100,50 @@
         select-fields "title, artist, label, year"
         qry-str (if (some? sort) (str "Select " select-fields " from release order by " sort)
                                  (str "Select " select-fields " from release order by artist"))
-        qry-map {:header ["Title" "Artist" "Label" "Release Year"]
+        qry-map {:title "Releases"
+                 :header ["Title" "Artist" "Label" "Release Year"]
                  :query qry-str}]       
    (reports-html qry-map)))
 
 
 
+(def report-map    
+         {"artist_count" 
+           {:title "Count by Artist"
+            :header ["Artist" "Count"] 
+            :query "Select artist, count(*) as count from release group by artist order by count(*) DESC"}
+          "label_count"
+           {:title "Count by Label"
+            :header ["Label" "Count"] 
+            :query "Select label, count(*) as count from release group by label order by count(*) DESC"}
+          "year_count"
+           {:title "Count by Year Released"
+            :header ["Year Released" "Count"] 
+            :query "Select year, count(*) as count from release group by year order by count(*) DESC"}
+          "year_month_added"
+           {:title "Count by Year/Month Added"
+            :header ["Year Added" "Month Added" "Count"]
+            :query "Select substr(dateadded,0,5), substr(dateadded,6,2), Count(*) 
+                    from release group by substr(dateadded,0,5), substr(dateadded,6,2)
+                    order by substr(dateadded,0,5) DESC, substr(dateadded,6,2) DESC"}})
+
+(defn report-query [ctx] 
+       (let [rpt (get-in ctx [:request :route-params :report])
+             qry-map (report-map rpt)]
+         (if qry-map (reports-html qry-map) "<HTML><HEAD></HEAD><BODY>Invalid report name</BODY>")))
 
 (defresource res-discogs [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
              :handle-ok (render discogs-root-template))
 
-(defn report-query [ctx] 
-       (if-let [qry-map (condp = (get-in ctx [:request :route-params :report])  
-                              "artist_count" 
-                              {:title "Count by Artist"
-                               :header ["Artist" "Count"] 
-                               :query "Select artist, count(*) as count from release group by artist order by count(*) DESC"}
-                              "label_count"
-                              {:title "Count by Label"
-                               :header ["Label" "Count"] 
-                               :query "Select label, count(*) as count from release group by label order by count(*) DESC"}
-                              "year_count"
-                              {:title "Count by Year Released"
-                               :header ["Year Released" "Count"] 
-                               :query "Select year, count(*) as count from release group by year order by count(*) DESC"}
-                              "year_month_added"
-                              {:title "Count by Year/Month Added"
-                               :header ["Year Added" "Month Added" "Count"]
-                               :query "Select substr(dateadded,0,5), substr(dateadded,6,2), Count(*) 
-                                       from release group by substr(dateadded,0,5), substr(dateadded,6,2)
-                                       order by substr(dateadded,0,5) DESC, substr(dateadded,6,2) DESC"})] 
-         
-         (reports-html qry-map)))
+(defresource res-releases [ctx] :allowed-methods [:get :options] 
+                                :available-media-types ["text/html"] 
+                                :handle-ok releases-query)
 
-(defresource res-releases [ctx] :allowed-methods [:get :options] :available-media-types ["text/html"] :handle-ok releases-query)
-(defresource res-reports [ctx] :allowed-methods [:get :options] :available-media-types ["text/html"] :handle-ok report-query)
+(defresource res-reports [ctx] :allowed-methods [:get :options] 
+                               :available-media-types ["text/html"] 
+                               :handle-ok report-query)
 
 (defroutes discogs-routes  
   (ANY "/discogs" [] res-discogs)
