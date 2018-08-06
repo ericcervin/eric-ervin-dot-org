@@ -12,7 +12,7 @@
      "<!DOCTYPE html>
       <html lang=\"en\">
         <head>
-        <title>Discogs</title>
+        <title>{{title}}</title>
           <style> table,th,td {
                   border: 1px solid black;
                   border-collapse: collapse;
@@ -22,6 +22,7 @@
           </style>
        </head>
        <body>
+         <h3>{{title}}</h3>
          <table id = \"id_release_table\">
            <thead><tr>{{#header}}<th>{{.}}</th>{{/header}}</tr></thead>
            <tbody>
@@ -37,9 +38,12 @@
 
 (defn reports-html [qry-map] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/discogs.db"}
                                    qry (:query qry-map)
+                                   title (:title qry-map)
                                    header (:header qry-map)
                                    results (sql/query db-spec [qry] {:as-arrays? true})
-                                   output-map {:header header :results (vec (map #(hash-map :result (vector-of-maps %)) (rest results)))}]
+                                   output-map {:title title
+                                               :header header 
+                                               :results (vec (map #(hash-map :result (vector-of-maps %)) (rest results)))}]
                                
                                (render discogs-report-template output-map)))
 
@@ -111,16 +115,20 @@
 (defn report-query [ctx] 
        (if-let [qry-map (condp = (get-in ctx [:request :route-params :report])  
                               "artist_count" 
-                              {:header ["Artist" "Count"] 
+                              {:title "Count by Artist"
+                               :header ["Artist" "Count"] 
                                :query "Select artist, count(*) as count from release group by artist order by count(*) DESC"}
                               "label_count"
-                              {:header ["Label" "Count"] 
+                              {:title "Count by Label"
+                               :header ["Label" "Count"] 
                                :query "Select label, count(*) as count from release group by label order by count(*) DESC"}
                               "year_count"
-                              {:header ["Year Released" "Count"] 
+                              {:title "Count by Year Released"
+                               :header ["Year Released" "Count"] 
                                :query "Select year, count(*) as count from release group by year order by count(*) DESC"}
                               "year_month_added"
-                              {:header ["Year Added" "Month Added" "Count"]
+                              {:title "Count by Year/Month Added"
+                               :header ["Year Added" "Month Added" "Count"]
                                :query "Select substr(dateadded,0,5), substr(dateadded,6,2), Count(*) 
                                        from release group by substr(dateadded,0,5), substr(dateadded,6,2)
                                        order by substr(dateadded,0,5) DESC, substr(dateadded,6,2) DESC"})] 
