@@ -88,9 +88,9 @@
         <thead><tr>
         <th scope=\"col\">Report</th><th scope=\"col\">Format</th></tr></thead>
         <tbody>
-          <tr><td>Count by Artist</td><td><a href=\"/discogs/reports/artist_count\">HTML</a></td></tr>
-          <tr><td>Count by Label</td><td><a href=\"/discogs/reports/label_count\">HTML</a></td></tr>
-          <tr><td>Count by Year Released</td><td><a href=\"/discogs/reports/year_count\">HTML</a></td></tr>
+          {{#reports}}
+          <tr><td>{{text}}</td><td><a href=\"/discogs/reports/{{key}}\">HTML</a></td></tr>
+          {{/reports}}
         </tbody>
       </table></div></body></html>")
   
@@ -127,6 +127,10 @@
                     from release group by substr(dateadded,0,5), substr(dateadded,6,2)
                     order by substr(dateadded,0,5) DESC, substr(dateadded,6,2) DESC"}})
 
+(def discogs-root-map {:reports (map #(hash-map :text (:title (last %)) :key (first %)) (sort-by #(:title (last %)) report-map))})
+                       
+
+
 (defn report-query [ctx] 
        (let [rpt (get-in ctx [:request :route-params :report])
              qry-map (report-map rpt)]
@@ -135,7 +139,7 @@
 (defresource res-discogs [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (render discogs-root-template))
+             :handle-ok (render discogs-root-template discogs-root-map))
 
 (defresource res-releases [ctx] :allowed-methods [:get :options] 
                                 :available-media-types ["text/html"] 
