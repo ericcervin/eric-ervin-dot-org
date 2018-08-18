@@ -52,7 +52,7 @@
 <!DOCTYPE html>
 <html lang=\"en\">
   <head>
-  <title>Philosophy USA</title>
+  <title>{{title}}</title>
   <style>table,th,td {
                border: 1px solid black;
                border-collapse: collapse;
@@ -64,6 +64,7 @@
 
   </head>
   <body>
+  <h3>{{title}}</h3>
   <table id = 'id_result_table'>
     <thead>
       <tr>{{#header}}<th>{{{.}}}</th>{{/header}}</tr>
@@ -82,32 +83,36 @@
 
 (defn reports-html [qry-map] (let [db-spec {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "resources/philosophy-usa.db"}
                                    qry (:query qry-map)
+                                   title (:title qry-map)
                                    header (:header qry-map)
                                    results (sql/query db-spec [qry] {:as-arrays? true})
-                                   output-map {:header header
+                                   output-map {:title title
+                                               :header header
                                                :results (vec (map #(hash-map :result (vector-of-maps %)) (rest results)))}]
+                                  
                                (render philosophy-reports-template output-map)))
 
 
-
-(defn report-query [ctx] 
-       (if-let [qry-map (condp = (get-in ctx [:request :route-params :report])  
+(def report-map              {
                               "state_count" 
-                              {:header ["State" "Count"] 
+                              {:title "Philosophy Degrees Completed by State"
+                               :header ["State" "Count"] 
                                :query "Select stabbr, count(*) as count 
                                        from completion cmp 
                                        join institution ins on cmp.inst = ins.unitid
                                        group by stabbr
                                        order by count(*) DESC"}
                               "inst_count" 
-                              {:header ["Institution" "Count"] 
+                              {:title "Philosophy Degrees Completed by Institution"
+                               :header ["Institution" "Count"] 
                                :query "Select instnm, count(*) as count 
                                        from completion cmp 
                                        join institution ins on cmp.inst = ins.unitid
                                        group by instnm
                                        order by count(*) DESC"}
                               "cip_count" 
-                              {:header ["CIP Code" "CIP Title" "Count"] 
+                              {:title "Philosophy Degrees Completed by Subject Classification"
+                               :header ["CIP Code" "CIP Title" "Count"] 
                                :query "Select cipcode, ciptitle, count(*) as count 
                                        from completion cmp 
                                        join cipcode chp on cmp.cip = chp.cipcode
@@ -115,14 +120,18 @@
                                        order by count(*) DESC"}
                                 
                               "awlevel_count"
-                              {:header ["Code" "Level" "Count"] 
+                              {:title "Philosophy Degrees Completed by Award Level"
+                               :header ["Code" "Level" "Count"] 
                                :query "Select alcode, alvalue, Count(*) 
                                        from alcode join completion
                                        on alcode.alcode = completion.awlevel
-                                       group by alcode, alvalue"})]
-         
-         
-         (reports-html qry-map)))
+                                       group by alcode, alvalue"}})
+
+
+(defn report-query [ctx] 
+       (let [rpt (get-in ctx [:request :route-params :report])
+             qry-map (report-map rpt)]
+         (if qry-map (reports-html qry-map) "<HTML><HEAD></HEAD><BODY>Invalid report name</BODY>")))
 
 (defresource res-reports [ctx] 
              :allowed-methods [:get :options] 
