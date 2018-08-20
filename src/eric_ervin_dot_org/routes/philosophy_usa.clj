@@ -31,19 +31,14 @@
 <div id=\"reports\">
   <h4>Reports</h4>
   <table>
-    <thead>
-    <tr>
-    <th scope=\"col\">Report</th>
-    <th scope=\"col\">Format</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr><td>Philosophy Degrees Completed by Award Level</td><td><a href=\"/philosophy/reports/awlevel_count\">HTML</a></td></tr>
-    <tr><td>Philosophy Degrees Completed by Institution</td><td><a href=\"/philosophy/reports/inst_count\">HTML</a></td></tr>
-    <tr><td>Philosophy Degrees Completed by State</td><td><a href=\"/philosophy/reports/state_count\">HTML</a></td></tr>
-    <tr><td>Philosophy Degrees Completed by Subject Classification</td><td><a href=\"/philosophy/reports/cip_count\">HTML</a></td></tr>
-    </tbody>
-  </table>
+        <thead><tr>
+        <th scope=\"col\">Report</th><th scope=\"col\">Format</th></tr></thead>
+        <tbody>
+          {{#reports}}
+          <tr><td>{{text}}</td><td><a href=\"/philosophy/reports/{{key}}\">HTML</a></td></tr>
+          {{/reports}}
+        </tbody>
+      </table>
 </div>
 </body>
 </html>")
@@ -128,6 +123,9 @@
                                        group by alcode, alvalue"}})
 
 
+(def philosophy-root-map {:reports (map #(hash-map :text (:title (last %)) :key (first %)) (sort-by #(:title (last %)) report-map))})
+
+
 (defn report-query [ctx] 
        (let [rpt (get-in ctx [:request :route-params :report])
              qry-map (report-map rpt)]
@@ -141,7 +139,7 @@
 (defresource res-philosophy [ctx]
              :allowed-methods [:get :options]
              :available-media-types ["text/html"]
-             :handle-ok (render philosophy-root-template))
+             :handle-ok (render philosophy-root-template philosophy-root-map))
 
 
 (defroutes philosophy-routes  
