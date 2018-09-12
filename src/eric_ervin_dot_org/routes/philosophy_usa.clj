@@ -92,35 +92,46 @@
                               "state_count" 
                               {:title "Philosophy Degrees Completed by State"
                                :header ["State" "Count"] 
-                               :query "Select stabbr, count(*) as count 
+                               :query "Select stabbr, sum(all_cnt) as count 
                                        from completion cmp 
                                        join institution ins on cmp.inst = ins.unitid
                                        group by stabbr
-                                       order by count(*) DESC"}
+                                       order by sum(all_cnt) DESC"}
                               "inst_count" 
                               {:title "Philosophy Degrees Completed by Institution"
                                :header ["Institution" "Count"] 
-                               :query "Select instnm, count(*) as count 
+                               :query "Select instnm, sum(all_cnt) as count 
                                        from completion cmp 
                                        join institution ins on cmp.inst = ins.unitid
                                        group by instnm
-                                       order by count(*) DESC"}
+                                       order by sum(all_cnt) DESC"}
                               "cip_count" 
                               {:title "Philosophy Degrees Completed by Subject Classification"
                                :header ["CIP Code" "CIP Title" "Count"] 
-                               :query "Select cipcode, ciptitle, count(*) as count 
+                               :query "Select cipcode, ciptitle, sum(all_cnt) as count 
                                        from completion cmp 
                                        join cipcode chp on cmp.cip = chp.cipcode
                                        group by cipcode, ciptitle
-                                       order by count(*) DESC"}
+                                       order by sum(all_cnt) DESC"}
                                 
                               "awlevel_count"
                               {:title "Philosophy Degrees Completed by Award Level"
                                :header ["Code" "Level" "Count"] 
-                               :query "Select alcode, alvalue, Count(*) 
+                               :query "Select alcode, alvalue, sum(all_cnt) 
                                        from alcode join completion
                                        on alcode.alcode = completion.awlevel
-                                       group by alcode, alvalue"}})
+                                       group by alcode, alvalue"}
+                              "u_of_w"
+                              {:title "Philosophy Degrees Completed at University of Washington"
+                               :header ["Institution" "Degree Level" "Count"] 
+                               :query "Select instnm, alvalue, sum(all_cnt) 
+                                       from completion cmp 
+                                       join institution ins on cmp.inst = ins.unitid
+                                       join alcode on cmp.awlevel = alcode.alcode
+                                       where instnm LIKE \"University of Washington%\"
+                                       and all_cnt > 0
+                                       group by instnm, alvalue"}})
+                              
 
 
 (def philosophy-root-map {:reports (map #(hash-map :text (:title (last %)) :key (first %)) (sort-by #(:title (last %)) report-map))})
