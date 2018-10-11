@@ -76,10 +76,10 @@
           </thead>
           <tbody>
             <tr>
-            <th>All</th><td><a href=\"/discogs/releases?sort=title\">HTML</a></td>
-            <td><a href=\"/discogs/releases?sort=artist\">HTML</a></td>
-            <td><a href=\"/discogs/releases?sort=label\">HTML</a></td>
-            <td><a href=\"/discogs/releases?sort=year\">HTML</a></td></tr>
+            <th>All</th><td><a href=\"/discogs/releases?sort=title,artist\">HTML</a></td>
+            <td><a href=\"/discogs/releases?sort=artist,title\">HTML</a></td>
+            <td><a href=\"/discogs/releases?sort=label,artist,title\">HTML</a></td>
+            <td><a href=\"/discogs/releases?sort=year,artist,title\">HTML</a></td></tr>
           </tbody>
        </table>
        </div>
@@ -99,7 +99,7 @@
   (let [sort (get-in ctx [:request :params "sort"] "Artist")
         select-fields "title, artist, label, year"
         qry-str (if (some? sort) (str "Select " select-fields " from release order by " sort)
-                                 (str "Select " select-fields " from release order by artist"))
+                                 (str "Select " select-fields " from release order by artist,title"))
         qry-map {:title (str "Releases by " (clojure.string/capitalize sort))
                  :header ["Title" "Artist" "Label" "Release Year"]
                  :query qry-str}]       
