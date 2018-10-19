@@ -96,11 +96,11 @@
   
 
 (defn releases-query [ctx] 
-  (let [sort (get-in ctx [:request :params "sort"] "Artist")
+  (let [sort (get-in ctx [:request :params "sort"] "artist,title")
         select-fields "title, artist, label, year"
-        qry-str (if (some? sort) (str "Select " select-fields " from release order by " sort)
-                                 (str "Select " select-fields " from release order by artist,title"))
-        qry-map {:title (str "Releases by " (clojure.string/capitalize sort))
+        qry-str (str "Select " select-fields " from release order by " sort)
+        sort-str (clojure.string/join "," (map clojure.string/capitalize (clojure.string/split sort #",")))
+        qry-map {:title (str "Releases by " sort-str)
                  :header ["Title" "Artist" "Label" "Release Year"]
                  :query qry-str}]       
    (reports-html qry-map)))
