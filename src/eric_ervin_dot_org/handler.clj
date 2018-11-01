@@ -36,8 +36,8 @@
              :handle-ok (fn [ctx] (get-in ctx [:request :route-params :etc])))
 
 
-(def resource-list {:resources [{:name "Destiny"    :path "/destiny"    :last-updated "10/25/2018" :desc "Star Wars Destiny card game data"}
-                                {:name "Discogs"    :path "/discogs"    :last-updated "10/04/2018" :desc "Albums I've cataloged"}
+(def resource-list {:resources [{:name "Destiny"    :path "/destiny"    :last-updated "11/01/2018" :desc "Star Wars Destiny card game data"}
+                                {:name "Discogs"    :path "/discogs"    :last-updated "11/01/2018" :desc "Albums I've cataloged"}
                                 {:name "Gematria"   :path "/gematria"   :last-updated "N/A" :desc "The numerical value of words"}
                                 {:name "Philosophy" :path "/philosophy" :last-updated "12/23/2017" :desc "Philosophy degrees completed during the 2014-2015 academic year"}
                                 {:name "Powerball"  :path "/powerball"  :last-updated "N/A" :desc "A source for Powerball numbers to play"}
