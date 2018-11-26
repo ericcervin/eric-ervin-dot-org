@@ -10,7 +10,8 @@
             [eric-ervin-dot-org.routes.gematria   :refer [gematria-routes]]
             [eric-ervin-dot-org.routes.philosophy-usa   :refer [philosophy-routes]]
             [eric-ervin-dot-org.routes.powerball :refer [powerball-routes]]
-            [eric-ervin-dot-org.routes.serialism :refer [serialism-routes]]))
+            [eric-ervin-dot-org.routes.serialism :refer [serialism-routes]]
+            [eric-ervin-dot-org.routes.wh-champions :refer [wh-champions-routes]]))
             
 
 (defn wrap-log-request [handler]
@@ -41,7 +42,8 @@
                                 {:name "Gematria"   :path "/gematria"   :last-updated "N/A" :desc "The numerical value of words"}
                                 {:name "Philosophy" :path "/philosophy" :last-updated "12/23/2017" :desc "Philosophy degrees completed during the 2014-2015 academic year"}
                                 {:name "Powerball"  :path "/powerball"  :last-updated "N/A" :desc "A source for Powerball numbers to play"}
-                                {:name "Serialism"  :path "/serialism"  :last-updated "N/A" :desc "Toying with set theory"}]})
+                                {:name "Serialism"  :path "/serialism"  :last-updated "N/A" :desc "Toying with set theory"}
+                                {:name "Warhammer Champions"  :path "/wh_champions"  :last-updated "11/26/18" :desc "Warhammer Age of Sigmar: Champions card game data"}]})
                      
 
 (def root-template
@@ -119,6 +121,8 @@
   powerball-routes
   
   serialism-routes
+  
+  wh-champions-routes
   
   (ANY "*" [_] not-found))
   
