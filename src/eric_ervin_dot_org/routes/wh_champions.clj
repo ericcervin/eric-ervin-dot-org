@@ -122,13 +122,14 @@
 (defn cards-query [ctx] 
   (let [ally (get-in ctx [:request :params "ally"])
         type (get-in ctx [:request :params "type"])
-        select-fields "cardNumber, alliance, category,class, name, rarity"
-        qry-str (cond (and (nil? ally) (nil? type))  (str "Select " select-fields " from card order by cardNumber")
-                      (and (nil? ally) (some? type)) (str "Select " select-fields " from card where category = \"" type "\" order by cardNumber")
-                      (and (some? ally) (nil? type)) (str "Select " select-fields " from card where alliance = \"" ally "\" order by cardNumber")
-                      :else (str "Select " select-fields " from card where alliance = \"" ally "\" and category = \"" type "\" order by cardNumber"))
+        select-fields "setName, cardNumber, alliance, category,class, name, rarity"
+        order "order by setNum, cardNumber"
+        qry-str (cond (and (nil? ally) (nil? type))  (str "Select " select-fields " from card " order)
+                      (and (nil? ally) (some? type)) (str "Select " select-fields " from card where category = \"" type "\" " order)
+                      (and (some? ally) (nil? type)) (str "Select " select-fields " from card where alliance = \"" ally "\" " order)
+                      :else (str "Select " select-fields " from card where alliance = \"" ally "\" and category = \"" type "\" " order))
         qry-map {:title (str ally " " type " " "Cards")
-                 :header ["Number", "Alliance", "Type","Class", "Name", "Rarity"]
+                 :header ["Set" "Number", "Alliance", "Type","Class", "Name", "Rarity"]
                  :query qry-str}]       
        (reports-html qry-map)))
 
