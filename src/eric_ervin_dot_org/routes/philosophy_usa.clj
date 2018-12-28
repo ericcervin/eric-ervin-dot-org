@@ -7,30 +7,29 @@
             ;;[eric-ervin-dot-org.representation :refer [html-style-css map-html-table-td map-html-table-tr]]))
 
 
-(def philosophy-root-template "
-<!DOCTYPE html>
+(def philosophy-root-template "<!DOCTYPE html>
 <html lang=\"en\">
-<head>
-  <style>table,th,td {
-               border: 1px solid black;
-               border-collapse: collapse;
-               padding: 3px;
-               text-align: center
-  }
+  <head>
+    <style>table,th,td {
+             border: 1px solid black;
+             border-collapse: collapse;
+             padding: 3px;
+             text-align: center
+    }
           td {text-align: left}
-  </style>
-  <title>Philosophy USA</title>
-</head>
-<body>
-<div id=\"header\">
-  <h1>Philosophy USA</h1>
-  <p>Philosophy and religious studies degrees completed during the 2014-2015 academic year.</p>
-  <p>Data taken from the Integrated Postsecondary Education Data System (IPEDS)</p>
-  <p><a href=\"https://nces.ed.gov/ipeds/Home/UseTheData\">https://nces.ed.gov/ipeds/Home/UseTheData</a></p>
-</div>
-<div id=\"reports\">
-  <h4>Reports</h4>
-  <table>
+    </style>
+    <title>Philosophy USA</title>
+  </head>
+  <body>
+    <div id=\"header\">
+      <h1>Philosophy USA</h1>
+      <p>Philosophy and religious studies degrees completed during the 2014-2015 academic year.</p>
+      <p>Data taken from the Integrated Postsecondary Education Data System (IPEDS)</p>
+      <p><a href=\"https://nces.ed.gov/ipeds/Home/UseTheData\">https://nces.ed.gov/ipeds/Home/UseTheData</a></p>
+    </div>
+    <div id=\"reports\">
+      <h4>Reports</h4>
+      <table>
         <thead><tr>
         <th scope=\"col\">Report</th><th scope=\"col\">Format</th></tr></thead>
         <tbody>
@@ -43,34 +42,32 @@
 </body>
 </html>")
 
-(def philosophy-reports-template "
-<!DOCTYPE html>
+(def philosophy-reports-template "<!DOCTYPE html>
 <html lang=\"en\">
   <head>
-  <title>{{title}}</title>
-  <style>table,th,td {
-               border: 1px solid black;
-               border-collapse: collapse;
-               padding: 3px;
-               text-align: center
-  }
-               td {text-align: left}
-  </style>
-
+    <title>{{title}}</title>
+    <style>table,th,td {
+             border: 1px solid black;
+             border-collapse: collapse;
+             padding: 3px;
+             text-align: center
+    }
+           td {text-align: left}
+    </style>
   </head>
   <body>
-  <h3>{{title}}</h3>
-  <table id = 'id_result_table'>
-    <thead>
-      <tr>{{#header}}<th>{{{.}}}</th>{{/header}}</tr>
-    </thead>
-    <tbody>
-      {{#results}}
-      <tr>{{#result}}<td>{{{vl}}}</td>{{/result}}</tr>
-      {{/results}}
-    </tbody>
-  </table>
-</body>
+    <h3>{{title}}</h3>
+    <table id = 'id_result_table'>
+      <thead>
+        <tr>{{#header}}<th>{{{.}}}</th>{{/header}}</tr>
+      </thead>
+      <tbody>
+        {{#results}}
+        <tr>{{#result}}<td>{{{vl}}}</td>{{/result}}</tr>
+        {{/results}}
+      </tbody>
+    </table>
+  </body>
 </html>")
 
 
@@ -95,6 +92,7 @@
                                :query "Select stabbr, sum(all_cnt) as count 
                                        from completion cmp 
                                        join institution ins on cmp.inst = ins.unitid
+                                       where year = '2015'
                                        group by stabbr
                                        order by sum(all_cnt) DESC"}
                               "inst_count" 
@@ -103,6 +101,7 @@
                                :query "Select instnm, sum(all_cnt) as count 
                                        from completion cmp 
                                        join institution ins on cmp.inst = ins.unitid
+                                       where year = '2015'
                                        group by instnm
                                        order by sum(all_cnt) DESC"}
                               "cip_count" 
@@ -111,6 +110,7 @@
                                :query "Select cipcode, ciptitle, sum(all_cnt) as count 
                                        from completion cmp 
                                        join cipcode chp on cmp.cip = chp.cipcode
+                                       where year = '2015'
                                        group by cipcode, ciptitle
                                        order by sum(all_cnt) DESC"}
                                 
@@ -120,6 +120,7 @@
                                :query "Select alcode, alvalue, sum(all_cnt) 
                                        from alcode join completion
                                        on alcode.alcode = completion.awlevel
+                                       where year = '2015'
                                        group by alcode, alvalue"}
                               "u_of_w"
                               {:title "Philosophy Degrees Completed at University of Washington"
@@ -130,8 +131,9 @@
                                        join alcode on cmp.awlevel = alcode.alcode
                                        where instnm LIKE \"University of Washington%\"
                                        and all_cnt > 0
+                                       and year = '2015'
                                        group by instnm, alvalue"}})
-                              
+                               
 
 
 (def philosophy-root-map {:reports (map #(hash-map :text (:title (last %)) :key (first %)) (sort-by #(:title (last %)) report-map))})
