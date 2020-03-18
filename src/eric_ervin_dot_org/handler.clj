@@ -37,13 +37,13 @@
              :handle-ok (fn [ctx] (get-in ctx [:request :route-params :etc])))
 
 
-(def resource-list {:resources [{:name "Destiny"    :path "/destiny"    :last-updated "07/27/2019" :desc "Star Wars Destiny card game data"}
+(def resource-list {:resources [;{:name "Destiny"    :path "/destiny"    :last-updated "07/27/2019" :desc "Star Wars Destiny card game data"}
                                 {:name "Discogs"    :path "/discogs"    :last-updated "12/23/2018" :desc "Albums I've cataloged"}
                                 {:name "Gematria"   :path "/gematria"   :last-updated "N/A" :desc "The numerical value of words"}
                                 {:name "Philosophy" :path "/philosophy" :last-updated "12/27/2018" :desc "Philosophy degrees completed during the 2014-2015 academic year"}
                                 {:name "Powerball"  :path "/powerball"  :last-updated "N/A" :desc "A source for Powerball numbers to play"}
-                                {:name "Serialism"  :path "/serialism"  :last-updated "N/A" :desc "Toying with set theory"}
-                                {:name "Warhammer Champions"  :path "/wh_champions"  :last-updated "06/09/2019" :desc "Warhammer Age of Sigmar: Champions card game data"}]})
+                                {:name "Serialism"  :path "/serialism"  :last-updated "N/A" :desc "Toying with set theory"}]})
+                                ;{:name "Warhammer Champions"  :path "/wh_champions"  :last-updated "06/09/2019" :desc "Warhammer Age of Sigmar: Champions card game data"}]})
                      
 
 (def root-template
