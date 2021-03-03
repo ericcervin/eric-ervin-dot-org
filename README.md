@@ -1,5 +1,7 @@
 # eric_ervin_dot_org
 
-Practice working with Clojure, Liberator, JDBC, SQLite, & Mustache. Maybe I'll make something useful along the way.
+*mothballed*
 
-Typically parked at ericervin.org .
+Practice working with Clojure, Liberator, JDBC, SQLite, & Mustache.
+
+formerly parked at ericervin.org .
